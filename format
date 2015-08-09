@@ -1,0 +1,1 @@
+clang-format -i include/ControlPlane/* src/*.cpp
