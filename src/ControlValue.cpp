@@ -3,4 +3,5 @@
 
 namespace ControlPlane
 {
+const char *ControlValue_file = __FILE__;
 }

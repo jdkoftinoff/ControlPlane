@@ -18,9 +18,9 @@ ControlDescriptor::ControlDescriptor( DescriptorCounts &counts,
     push_back_multi( m_control_point_values, first );
 }
 
-const DescriptorObjectName *ControlDescriptor::getName( size_t name_index ) const
+const DescriptorString *ControlDescriptor::getName( size_t name_index ) const
 {
-    DescriptorObjectName const *r = nullptr;
+    DescriptorString const *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;
@@ -28,9 +28,9 @@ const DescriptorObjectName *ControlDescriptor::getName( size_t name_index ) cons
     return r;
 }
 
-DescriptorObjectName *ControlDescriptor::getName( size_t name_index )
+DescriptorString *ControlDescriptor::getName( size_t name_index )
 {
-    DescriptorObjectName *r = nullptr;
+    DescriptorString *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;

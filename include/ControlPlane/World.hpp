@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <memory>
 #include <vector>
+#include <typeinfo>
 #include <array>
 #include <valarray>
 #include <algorithm>

@@ -20,9 +20,9 @@ class MatrixDescriptor : public Descriptor
 
     uint16_t getNumNames() const override { return 1; }
 
-    DescriptorObjectName const *getName( size_t name_index = 0 ) const override;
+    DescriptorString const *getName( size_t name_index = 0 ) const override;
 
-    DescriptorObjectName *getName( size_t name_index = 0 ) override;
+    DescriptorString *getName( size_t name_index = 0 ) override;
 
     bool setName( string val, size_t name_index = 0 ) override;
 
@@ -55,19 +55,23 @@ class MatrixDescriptor : public Descriptor
         return m_control_point_values[h][w][item_num];
     }
 
+    void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
+
   private:
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
     uint16_t m_avdecc_control_value_type;
-    DescriptorObjectName m_object_name;
+    DescriptorString m_object_name;
     vector<vector<vector<ControlValue> > > m_control_point_values;
 };
 
+using MatrixDescriptorPtr = shared_ptr<MatrixDescriptor>;
+
 template <typename... T>
-DescriptorPtr makeMatrixDescriptor( T &&... args )
+MatrixDescriptorPtr makeMatrixDescriptor( T &&... args )
 {
-    return DescriptorPtr( new MatrixDescriptor( args... ) );
+    return MatrixDescriptorPtr( new MatrixDescriptor( args... ) );
 }
 }

@@ -10,6 +10,7 @@ uint64_t ChangeNotifierManager::addChangeNotifier( ChangeNotifierPtr item )
     uint64_t identity = item->getIdentity();
 
     m_items[identity] = item;
+
     return identity;
 }
 

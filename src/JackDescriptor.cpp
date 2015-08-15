@@ -4,9 +4,9 @@
 namespace ControlPlane
 {
 
-const DescriptorObjectName *JackDescriptor::getName( size_t name_index ) const
+const DescriptorString *JackDescriptor::getName( size_t name_index ) const
 {
-    DescriptorObjectName const *r = nullptr;
+    DescriptorString const *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;
@@ -14,9 +14,9 @@ const DescriptorObjectName *JackDescriptor::getName( size_t name_index ) const
     return r;
 }
 
-DescriptorObjectName *JackDescriptor::getName( size_t name_index )
+DescriptorString *JackDescriptor::getName( size_t name_index )
 {
-    DescriptorObjectName *r = nullptr;
+    DescriptorString *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;

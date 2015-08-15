@@ -16,9 +16,9 @@ class StreamDescriptor : public Descriptor
 
     uint16_t getNumNames() const override { return 1; }
 
-    DescriptorObjectName const *getName( size_t name_index = 0 ) const override;
+    DescriptorString const *getName( size_t name_index = 0 ) const override;
 
-    DescriptorObjectName *getName( size_t name_index = 0 ) override;
+    DescriptorString *getName( size_t name_index = 0 ) override;
 
     bool setName( string val, size_t name_index = 0 ) override;
 
@@ -45,16 +45,20 @@ class StreamDescriptor : public Descriptor
         throw std::runtime_error( "no value" );
     }
 
+    void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
+
   private:
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
-    DescriptorObjectName m_object_name;
+    DescriptorString m_object_name;
 };
 
+using StreamDescriptorPtr = shared_ptr<StreamDescriptor>;
+
 template <typename... T>
-DescriptorPtr makeStreamDescriptor( T &&... args )
+StreamDescriptorPtr makeStreamDescriptor( T &&... args )
 {
-    return DescriptorPtr( new StreamDescriptor( args... ) );
+    return StreamDescriptorPtr( new StreamDescriptor( args... ) );
 }
 }

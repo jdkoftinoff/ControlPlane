@@ -7,6 +7,9 @@ namespace ControlPlane
 namespace Util
 {
 
+string escapeString( string const &raw );
+string unEscapeString( string const &v );
+
 template <typename OutT, typename InT>
 void lexical_cast( OutT &r, InT const &v )
 {

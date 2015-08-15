@@ -16,18 +16,18 @@ int compare( const ControlIdentity &lhs, const ControlIdentity &rhs )
             {
                 if ( lhs.m_item == rhs.m_item )
                 {
-                    if ( lhs.m_w_pos == rhs.m_w_pos )
+                    if ( lhs.m_h_pos == rhs.m_h_pos )
                     {
-                        if ( lhs.m_h_pos == rhs.m_h_pos )
+                        if ( lhs.m_w_pos == rhs.m_w_pos )
                         {
                             r = 0;
                         }
-                        else if ( lhs.m_h_pos < rhs.m_h_pos )
+                        else if ( lhs.m_w_pos < rhs.m_w_pos )
                         {
                             r = -1;
                         }
                     }
-                    else if ( lhs.m_w_pos < rhs.m_w_pos )
+                    else if ( lhs.m_h_pos < rhs.m_h_pos )
                     {
                         r = -1;
                     }

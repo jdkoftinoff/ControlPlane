@@ -3,7 +3,7 @@
 #include "World.hpp"
 #include "Schema.hpp"
 #include "Descriptor.hpp"
-#include "ChangeNotificationRange.hpp"
+#include "ControlIdentityComparator.hpp"
 #include "ChangeNotificationState.hpp"
 #include "ChangeNotifier.hpp"
 #include "ChangeNotifierManager.hpp"

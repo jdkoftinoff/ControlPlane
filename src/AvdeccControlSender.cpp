@@ -3,4 +3,5 @@
 
 namespace ControlPlane
 {
+const char *AvdeccControlSender_file = __FILE__;
 }

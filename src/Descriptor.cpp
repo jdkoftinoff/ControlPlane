@@ -3,4 +3,5 @@
 
 namespace ControlPlane
 {
+const char *Descriptor_file = __FILE__;
 }

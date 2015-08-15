@@ -16,9 +16,9 @@ MatrixDescriptor::MatrixDescriptor( DescriptorCounts &counts,
 {
 }
 
-const DescriptorObjectName *MatrixDescriptor::getName( size_t name_index ) const
+const DescriptorString *MatrixDescriptor::getName( size_t name_index ) const
 {
-    DescriptorObjectName const *r = nullptr;
+    DescriptorString const *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;
@@ -26,9 +26,9 @@ const DescriptorObjectName *MatrixDescriptor::getName( size_t name_index ) const
     return r;
 }
 
-DescriptorObjectName *MatrixDescriptor::getName( size_t name_index )
+DescriptorString *MatrixDescriptor::getName( size_t name_index )
 {
-    DescriptorObjectName *r = nullptr;
+    DescriptorString *r = nullptr;
     if ( name_index == 0 )
     {
         r = &m_object_name;

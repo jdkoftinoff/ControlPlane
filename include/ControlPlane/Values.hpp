@@ -2,8 +2,6 @@
 
 #include "World.hpp"
 #include "RangedValue.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
 
 namespace ControlPlane
 {
@@ -27,4 +25,8 @@ using Gain = RangedValue<UnitsCode::LevelDb, -900, 100, 0, 10, -1, int32_t, floa
 using ControlStringValue = RangedValue<UnitsCode::Unitless, 0, 0, 0, 0, 0, ControlPlane::AvdeccControlString, std::string>;
 
 using VuMeterDbFsPeak = RangedValue<UnitsCode::LevelDbFsPeak, -128, 0, 0, 1, -1, int8_t, float>;
+
+using EUI64 = RangedValueEUI64;
+
+using DescriptorString = RangedValue<UnitsCode::Unitless, 0, 0, 0, 0, 0, ControlPlane::AvdeccNameString, std::string>;
 }

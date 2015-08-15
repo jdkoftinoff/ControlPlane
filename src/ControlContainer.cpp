@@ -8,8 +8,7 @@ ControlContainerPtr ControlContainer::addItem( const SchemaAddressElement &subno
 {
     ControlContainerPtr item;
 
-    // Return the existing container item if any, or create one if it doesn't
-    // exist
+    // Return the existing container item if any, or create one if it doesn't exist
 
     auto container_it = m_container_items.find( subnode );
     if ( container_it != m_container_items.end() )

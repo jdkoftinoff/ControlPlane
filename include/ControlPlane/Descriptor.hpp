@@ -3,19 +3,19 @@
 #include "World.hpp"
 #include "ControlValue.hpp"
 #include "ControlIdentity.hpp"
+#include "Values.hpp"
+#include "ControlIdentityComparator.hpp"
 
 namespace ControlPlane
 {
-
-using DescriptorObjectName = RangedValue<UnitsCode::Unitless, 0, 0, 0, 0, 0, ControlPlane::AvdeccNameString, std::string>;
 
 class Descriptor
 {
   public:
     virtual ~Descriptor() {}
     virtual uint16_t getNumNames() const = 0;
-    virtual DescriptorObjectName const *getName( size_t name_index = 0 ) const = 0;
-    virtual DescriptorObjectName *getName( size_t name_index = 0 ) = 0;
+    virtual DescriptorString const *getName( size_t name_index = 0 ) const = 0;
+    virtual DescriptorString *getName( size_t name_index = 0 ) = 0;
     virtual bool setName( string val, size_t name_index = 0 ) = 0;
     virtual uint64_t getAvdeccControlType() const = 0;
     virtual uint16_t getAvdeccDescriptorType() const = 0;
@@ -27,6 +27,7 @@ class Descriptor
     virtual uint16_t getHeight() const = 0;
     virtual ControlValue &getValue( size_t item_num, size_t w = 0, size_t h = 0 ) = 0;
     virtual const ControlValue &getValue( size_t item_num, size_t w = 0, size_t h = 0 ) const = 0;
+    virtual void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) = 0;
 
     ControlIdentity getControlIdentity() const
     {
@@ -37,20 +38,20 @@ class Descriptor
     ControlIdentity getControlIdentityForItem( uint16_t item_num ) const
     {
         ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionItemLevel, item_num );
+            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionDescriptorLevel, item_num );
         return r;
     }
-    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t w_pos ) const
+    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos ) const
     {
         ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionWPosLevel, item_num, w_pos );
+            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionWPosLevel, item_num, h_pos );
         return r;
     }
 
-    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t w_pos, uint16_t h_pos ) const
+    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos, uint16_t w_pos ) const
     {
         ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionHPosLevel, item_num, w_pos, h_pos );
+            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionHPosLevel, item_num, h_pos, w_pos );
         return r;
     }
 

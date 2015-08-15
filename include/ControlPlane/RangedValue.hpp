@@ -113,6 +113,14 @@ class RangedValueBase
     ///
     virtual string getUnencodedValueString( bool enable_units = true ) const = 0;
 
+    virtual string getUnencodedMinimumString( bool enable_units = true ) const = 0;
+
+    virtual string getUnencodedMaximumString( bool enable_units = true ) const = 0;
+
+    virtual string getUnencodedDefaultString( bool enable_units = true ) const = 0;
+
+    virtual string getUnencodedStepString( bool enable_units = true ) const = 0;
+
     ///
     /// \brief getUnencodedValueBool
     /// \return the unencoded value as a bool
@@ -453,7 +461,67 @@ class RangedValue : public RangedValueBase
     string getUnencodedValueString( bool enable_units ) const override
     {
         std::ostringstream buf;
-        buf << m_value;
+        buf << getValue();
+        if ( enable_units )
+        {
+            const char *suffix = getAvdeccUnitsSuffix( units );
+            if ( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
+    }
+
+    string getUnencodedMinimumString( bool enable_units ) const override
+    {
+        std::ostringstream buf;
+        buf << getMinValue();
+        if ( enable_units )
+        {
+            const char *suffix = getAvdeccUnitsSuffix( units );
+            if ( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
+    }
+
+    string getUnencodedMaximumString( bool enable_units ) const override
+    {
+        std::ostringstream buf;
+        buf << getMaxValue();
+        if ( enable_units )
+        {
+            const char *suffix = getAvdeccUnitsSuffix( units );
+            if ( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
+    }
+
+    string getUnencodedStepString( bool enable_units ) const override
+    {
+        std::ostringstream buf;
+        buf << getStepValue();
+        if ( enable_units )
+        {
+            const char *suffix = getAvdeccUnitsSuffix( units );
+            if ( suffix && *suffix )
+            {
+                buf << " " << suffix;
+            }
+        }
+        return buf.str();
+    }
+
+    string getUnencodedDefaultString( bool enable_units ) const override
+    {
+        std::ostringstream buf;
+        buf << getDefaultValue();
         if ( enable_units )
         {
             const char *suffix = getAvdeccUnitsSuffix( units );
@@ -745,7 +813,7 @@ class RangedValue : public RangedValueBase
         {
             throw std::domain_error( "Min Value too small for encoding" );
         }
-        *dest = rounded_v;
+        *dest = static_cast<T>( rounded_v );
     }
 
     void getEncodedValueAvdeccString( AvdeccString *storage ) const override
@@ -841,6 +909,8 @@ class RangedValue : public RangedValueBase
         value_type v = value_type( encoded_v ) * decoding_multiplier / decoding_divider;
         return setValue( v );
     }
+
+    bool setFromEncodedValue( bool encoded_v ) { return setValue( encoded_v ); }
 
     void setFromEncodedValueAvdeccString( const AvdeccString *storage ) override
     {
@@ -1116,7 +1186,7 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     string getUnencodedValueString( bool enable_units ) const override
     {
         std::ostringstream buf;
-        buf << m_value;
+        buf << getValue();
         if ( enable_units )
         {
             const char *suffix = getAvdeccUnitsSuffix( units );
@@ -1127,6 +1197,14 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
         }
         return buf.str();
     }
+
+    string getUnencodedMinimumString( bool enable_units ) const override { return ""; }
+
+    string getUnencodedMaximumString( bool enable_units ) const override { return ""; }
+
+    string getUnencodedDefaultString( bool enable_units ) const override { return ""; }
+
+    string getUnencodedStepString( bool enable_units ) const override { return ""; }
 
     bool getUnencodedValueBool() const override { return m_value == "true" ? true : false; }
 
@@ -1524,5 +1602,341 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     /// The actual non-encoded value
     ///
     value_type m_value;
+};
+
+class RangedValueEUI64 : public RangedValueBase
+{
+    uint64_t m_value;
+
+  public:
+    RangedValueEUI64( uint64_t v = 0 ) : m_value( v ) {}
+    virtual ~RangedValueEUI64() {}
+
+    ///
+    /// \brief getUnitsCode
+    ///
+    /// \return The UnitsCode for this value
+    ///
+    UnitsCode getUnitsCode() const override { return UnitsCode::Unitless; }
+
+    ///
+    /// \brief getStorageType
+    /// \return The EncodingType used for the storage of this value
+    ///
+    EncodingType getStorageType() const override { return EncodingType::ENCODING_UINT64; }
+
+    ///
+    /// \brief getEncodingType
+    /// \return The EncodingType used for the encoded transport of this value
+    ///
+    EncodingType getEncodingType() const override { return EncodingType::ENCODING_UINT64; }
+
+    bool setValue( uint64_t v )
+    {
+        bool r = false;
+        if ( m_value != v )
+        {
+            m_value = v;
+            r = true;
+        }
+        return r;
+    }
+
+    ///
+    /// \brief setUnencodedValueString
+    ///
+    /// If storage type and encoding type are both string, then set
+    /// the string value
+    ///
+    /// \param v The new string value
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueString( string const &sv ) override
+    {
+        std::istringstream is( sv );
+        is >> std::hex;
+        uint64_t v = 0;
+        is >> v;
+        return setValue( v );
+    }
+
+    ///
+    /// \brief setUnencodedValueBool
+    ///
+    /// Set the unencoded value from a bool
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueBool( bool v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief setUnencodedValueFloat
+    ///
+    /// Set the unencoded value from a float
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueFloat( float v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief setUnencodedValueDouble
+    ///
+    /// Set the unencoded value from a double
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueDouble( double v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief setUnencodedValueInt64
+    ///
+    /// Set the unencoded value from an int64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueInt64( int64_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief setUnencodedValueUInt64
+    ///
+    /// Set the unencoded value from an uint64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueUInt64( uint64_t v ) override { return setValue( v ); }
+
+    ///
+    /// \brief getUnencodedValueString
+    ///
+    /// Get the unencoded value string. If the
+    /// storage type and encoding type is string, then
+    /// it returns the value. If the storage type is not
+    /// string then it returns the textual representation
+    /// optionally with units
+    ///
+    /// \return the string representation of the unencoded value
+    ///
+    string getUnencodedValueString( bool enable_units = true ) const override
+    {
+        std::ostringstream ss;
+        ss << std::hex;
+        ss << m_value;
+        return ss.str();
+    }
+
+    string getUnencodedMinimumString( bool enable_units = true ) const override { return "0"; }
+
+    string getUnencodedMaximumString( bool enable_units = true ) const override { return "ffffffffffffffff"; }
+
+    string getUnencodedDefaultString( bool enable_units = true ) const override { return "0"; }
+
+    string getUnencodedStepString( bool enable_units = true ) const override { return "0"; }
+
+    ///
+    /// \brief getUnencodedValueBool
+    /// \return the unencoded value as a bool
+    ///
+    bool getUnencodedValueBool() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief getUnencodedValueFloat
+    /// \return the unencoded value as a float
+    ///
+    float getUnencodedValueFloat() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief getUnencodedValueDouble
+    /// \return the unencoded value as a double
+    ///
+    double getUnencodedValueDouble() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief getUnencodedValueInt64
+    /// \return the unencoded value as an int64_t
+    ///
+    int64_t getUnencodedValueInt64() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief getUnencodedValueUInt64
+    /// \return the unencoded value as a uint64_t
+    ///
+    uint64_t getUnencodedValueUInt64() const override { return m_value; }
+
+    float getUnencodedMinimumFloat() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint64_t getUnencodedMinimumUInt64() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    float getUnencodedMaximumFloat() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint64_t getUnencodedMaximumUInt64() const override { return 0xffffffffffffffffULL; }
+
+    ///
+    /// \brief incValue
+    ///
+    /// Increment the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    bool incValue() override { return false; }
+
+    ///
+    /// \brief decValue
+    ///
+    /// Decrement the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    bool decValue() override { return false; }
+
+    void getEncodedValueAvdeccString( AvdeccString *storage ) const override { storage->set( getUnencodedValueString() ); }
+
+    int8_t getEncodedValueInt8() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint8_t getEncodedValueUInt8() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    int16_t getEncodedValueInt16() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint16_t getEncodedValueUInt16() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    int32_t getEncodedValueInt32() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint32_t getEncodedValueUInt32() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    int64_t getEncodedValueInt64() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    uint64_t getEncodedValueUInt64() const override { return m_value; }
+
+    float getEncodedValueFloat() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    double getEncodedValueDouble() const override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) { setUnencodedValueString( storage->get() ); }
+
+    bool setFromEncodedValueInt8( int8_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueUInt8( uint8_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueInt16( int16_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueUInt16( uint16_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueInt32( int32_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueUInt32( uint32_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueInt64( int64_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueUInt64( uint64_t v ) override
+    {
+        bool changed = false;
+        if ( m_value != v )
+        {
+            m_value = v;
+            changed = true;
+        }
+        return changed;
+    }
+
+    bool setFromEncodedValueFloat( float v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueDouble( double v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampInt8( int8_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampUInt8( uint8_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampInt16( int16_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampUInt16( uint16_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampInt32( int32_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampUInt32( uint32_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampInt64( int64_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampUInt64( uint64_t v ) override { return setFromEncodedValueUInt64( v ); }
+
+    bool setFromEncodedValueWithClampFloat( float v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    bool setFromEncodedValueWithClampDouble( double v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
+
+    ///
+    /// \brief getEncodedMinValue
+    /// \return The encoded minimum value
+    ///
+    int64_t getEncodedMinValue() const override { return 0; }
+
+    ///
+    /// \brief getEncodedMaxValue
+    /// \return The encoded maximum value
+    ///
+    int64_t getEncodedMaxValue() const override { return 0; }
+
+    ///
+    /// \brief getEncodedStepValue
+    /// \return The encoded step value
+    ///
+    int64_t getEncodedStepValue() const override { return 0; }
+
+    ///
+    /// \brief getEncodedDefaultValue
+    /// \return the encoded default value
+    ///
+    int64_t getEncodedDefaultValue() const override { return 0; }
+
+    ///
+    /// \brief getEncodingMultiplierPower
+    /// \return the power of 10 used for encoding
+    ///
+    int8_t getEncodingMultiplierPower() const override { return 0; }
+
+    ///
+    /// \brief getUnitsSuffix
+    ///
+    /// Get the units suffix
+    ///
+    /// \return C string containing UTF8 suffix for the SI Units used
+    ///
+    const char *getUnitsSuffix() const override { return ""; }
+
+    bool setUnencodedValue( bool v ) { return setUnencodedValueBool( v ); }
+
+    bool setUnencodedValue( double v ) { return setUnencodedValueDouble( v ); }
+
+    bool setUnencodedValue( float v ) { return setUnencodedValueFloat( v ); }
+
+    bool setUnencodedValue( int8_t v ) { return setUnencodedValueInt64( v ); }
+
+    bool setUnencodedValue( uint8_t v ) { return setUnencodedValueUInt64( v ); }
+
+    bool setUnencodedValue( int16_t v ) { return setUnencodedValueInt64( v ); }
+
+    bool setUnencodedValue( uint16_t v ) { return setUnencodedValueUInt64( v ); }
+
+    bool setUnencodedValue( int32_t v ) { return setUnencodedValueInt64( v ); }
+
+    bool setUnencodedValue( uint32_t v ) { return setUnencodedValueUInt64( v ); }
+
+    bool setUnencodedValue( int64_t v ) { return setUnencodedValueInt64( v ); }
+
+    bool setUnencodedValue( uint64_t v ) { return setUnencodedValueUInt64( v ); }
+
+    void getUnencodedValue( bool *v ) const { *v = getUnencodedValueBool(); }
+
+    void getUnencodedValue( double *v ) const { *v = getUnencodedValueDouble(); }
+
+    void getUnencodedValue( float *v ) const { *v = getUnencodedValueFloat(); }
+
+    void getUnencodedValue( int64_t *v ) const { *v = getUnencodedValueInt64(); }
+
+    void getUnencodedValue( string *v ) const { *v = getUnencodedValueString( false ); }
+
+    void getUnencodedValue( uint64_t *v ) const { *v = getUnencodedValueUInt64(); }
 };
 }

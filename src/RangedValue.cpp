@@ -4,4 +4,5 @@
 
 namespace ControlPlane
 {
+const char *RangedValue_file = __FILE__;
 }

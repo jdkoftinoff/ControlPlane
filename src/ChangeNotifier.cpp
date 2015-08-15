@@ -12,7 +12,7 @@ ChangeNotifier::ChangeNotifier( Milliseconds min_scan_period_in_milliseconds )
 {
 }
 
-void ChangeNotifier::removeSubscription( ChangeNotificationRange sub )
+void ChangeNotifier::removeSubscription( ControlIdentityComparatorPtr sub )
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
 
@@ -23,26 +23,30 @@ void ChangeNotifier::removeSubscription( ChangeNotificationRange sub )
     }
 }
 
-void ChangeNotifier::addSubscription( ChangeNotificationRange sub,
+void ChangeNotifier::addSubscription( ControlIdentityComparatorPtr sub,
                                       Milliseconds max_update_period_in_milliseconds,
                                       Milliseconds min_update_period_in_milliseconds,
+                                      Milliseconds current_time_in_milliseconds,
                                       ChangeNotificationCallback callback )
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
 
-    m_subscriptions[sub]
-        = ChangeNotificationState{max_update_period_in_milliseconds, min_update_period_in_milliseconds, callback};
+    m_subscriptions[sub] = ChangeNotificationState{max_update_period_in_milliseconds,
+                                                   min_update_period_in_milliseconds,
+                                                   current_time_in_milliseconds,
+                                                   Milliseconds( 0 ),
+                                                   callback};
 }
 
-void ChangeNotifier::controlChanged( Milliseconds current_timestamp_in_milliseconds, ControlIdentity descriptor_identity )
+void ChangeNotifier::controlChanged( Milliseconds current_timestamp_in_milliseconds, ControlIdentity control_identity )
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
     for ( auto &sub : m_subscriptions )
     {
-        if ( sub.first.containsDescriptor( descriptor_identity ) )
+        if ( sub.first->containsControl( control_identity ) )
         {
             sub.second.m_last_change_time_in_milliseconds = current_timestamp_in_milliseconds;
-            sub.second.m_changed_items.insert( descriptor_identity );
+            sub.second.m_changed_items.insert( control_identity );
         }
     }
 }
@@ -58,25 +62,29 @@ void ChangeNotifier::tick( Milliseconds current_timestamp_in_milliseconds )
         for ( auto &sub : m_subscriptions )
         {
             bool notify = false;
-            ChangeNotificationRange const &range = sub.first;
+            ControlIdentityComparatorPtr const &comparator = sub.first;
             ChangeNotificationState &state = sub.second;
 
             // notify the callback if no notification has happened since
-            // range.m_last_change_acknowledged_time_in_milliseconds
-            if ( ( current_timestamp_in_milliseconds - state.m_last_change_acknowledged_time_in_milliseconds )
-                 >= range.m_min_update_period_in_milliseconds )
+            // range.m_last_change_acknowledged_time_in_milliseconds, But only if m_min_update_period_in_milliseconds
+            // is actually set
+            if ( state.m_min_update_period_in_milliseconds != Milliseconds( 0 )
+                 && ( current_timestamp_in_milliseconds - state.m_last_change_acknowledged_time_in_milliseconds )
+                    >= state.m_min_update_period_in_milliseconds )
             {
                 notify = true;
+
+                // ask the comparator to fill in the changed_items set with all the
+                // relevant items
+                comparator->fillSet( state.m_changed_items );
             }
             else
             {
-                // Did something change since the last time we called the
-                // callback?
+                // Did something change since the last time we called the callback?
                 if ( state.m_last_change_time_in_milliseconds > state.m_last_change_acknowledged_time_in_milliseconds )
                 {
-                    // Yes, was it changed at least
-                    // state.m_max_update_period_in_milliseconds ago?
-                    if ( ( current_timestamp_in_milliseconds - range.m_max_update_period_in_milliseconds )
+                    // Yes, was it changed at least state.m_max_update_period_in_milliseconds ago?
+                    if ( ( current_timestamp_in_milliseconds - state.m_max_update_period_in_milliseconds )
                          >= state.m_last_change_acknowledged_time_in_milliseconds )
                     {
                         // yes, do the notify
@@ -85,11 +93,14 @@ void ChangeNotifier::tick( Milliseconds current_timestamp_in_milliseconds )
                 }
             }
 
-            // if there is a reason to notify the callback, do so now, and
-            // remember when we did it
+            // if there is a reason to notify the callback, do so now, and remember when we did it
             if ( notify )
             {
-                state.m_callback( range, state.m_changed_items );
+                if ( !state.m_callback )
+                {
+                    throw std::runtime_error( "No callback set for subscription" );
+                }
+                state.m_callback( current_timestamp_in_milliseconds, comparator, state.m_changed_items );
                 state.m_last_change_acknowledged_time_in_milliseconds = current_timestamp_in_milliseconds;
                 state.m_changed_items.clear();
             }

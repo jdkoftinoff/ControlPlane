@@ -27,6 +27,10 @@ IF (APPLE)
     set(LIBS ${LIBS} ${COREFOUNDATION_LIBRARY})
 ENDIF (APPLE)
 
+IF (WIN32)
+    add_definitions(-DWIN32_LEAN_AND_MEAN)
+ENDIF (WIN32)
+
 if (${CXX11} MATCHES "ON")
     # Compiler-specific C++11 activation.
     if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")

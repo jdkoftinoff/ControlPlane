@@ -3,4 +3,5 @@
 
 namespace ControlPlane
 {
+const char *SchemaGenerator_file = __FILE__;
 }

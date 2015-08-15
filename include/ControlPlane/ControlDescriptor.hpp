@@ -50,9 +50,9 @@ class ControlDescriptor : public Descriptor
 
     uint16_t getNumNames() const override { return 1; }
 
-    DescriptorObjectName const *getName( size_t name_index = 0 ) const override;
+    DescriptorString const *getName( size_t name_index = 0 ) const override;
 
-    DescriptorObjectName *getName( size_t name_index = 0 ) override;
+    DescriptorString *getName( size_t name_index = 0 ) override;
 
     bool setName( string val, size_t name_index = 0 ) override;
 
@@ -79,19 +79,23 @@ class ControlDescriptor : public Descriptor
         return m_control_point_values[item_num];
     }
 
+    void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
+
   private:
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
     uint16_t m_avdecc_control_value_type;
-    DescriptorObjectName m_object_name;
+    DescriptorString m_object_name;
     vector<ControlValue> m_control_point_values;
 };
 
+using ControlDescriptorPtr = shared_ptr<ControlDescriptor>;
+
 template <typename... T>
-DescriptorPtr makeControlDescriptor( T &&... args )
+ControlDescriptorPtr makeControlDescriptor( T &&... args )
 {
-    return DescriptorPtr( new ControlDescriptor( args... ) );
+    return ControlDescriptorPtr( new ControlDescriptor( args... ) );
 }
 }

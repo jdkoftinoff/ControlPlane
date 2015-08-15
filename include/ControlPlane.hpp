@@ -11,7 +11,7 @@
 #include "ControlPlane/AvdeccString.hpp"
 #include "ControlPlane/AvdeccUnits.hpp"
 #include "ControlPlane/ChangeNotification.hpp"
-#include "ControlPlane/ChangeNotificationRange.hpp"
+#include "ControlPlane/ControlIdentityComparator.hpp"
 #include "ControlPlane/ChangeNotificationState.hpp"
 #include "ControlPlane/ChangeNotifier.hpp"
 #include "ControlPlane/ChangeNotifierManager.hpp"
@@ -30,5 +30,7 @@
 #include "ControlPlane/SchemaGenerator.hpp"
 #include "ControlPlane/SchemaAdaptor.hpp"
 #include "ControlPlane/StreamDescriptor.hpp"
+#include "ControlPlane/Text.hpp"
+#include "ControlPlane/TextIOWithStream.hpp"
 #include "ControlPlane/Values.hpp"
 

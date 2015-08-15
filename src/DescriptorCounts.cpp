@@ -3,4 +3,5 @@
 
 namespace ControlPlane
 {
+const char *DescriptorCounts_file = __FILE__;
 }

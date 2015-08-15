@@ -16,9 +16,15 @@ void Schema::collectDescriptors()
                             } );
 }
 
-const DescriptorPtr Schema::getDescriptor( const ControlIdentity &identity ) const
+const DescriptorPtr Schema::getDescriptor( const ControlIdentity &requested_identity ) const
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
+    ControlIdentity identity = requested_identity;
+    identity.m_section = ControlIdentity::SectionDescriptorLevel;
+    identity.m_item = 0;
+    identity.m_w_pos = 0;
+    identity.m_h_pos = 0;
+
     DescriptorPtr r;
     auto i = m_descriptor_avdecc_map.find( identity );
     if ( i != m_descriptor_avdecc_map.end() )
@@ -27,15 +33,19 @@ const DescriptorPtr Schema::getDescriptor( const ControlIdentity &identity ) con
     }
     else
     {
-        throw std::runtime_error(
-            formstring( "No such descriptor: ", identity.m_descriptor_type, ",", identity.m_descriptor_index ) );
+        throw SchemaErrorNoSuchDescriptor( identity.m_descriptor_type, identity.m_descriptor_index );
     }
     return r;
 }
 
-DescriptorPtr Schema::getDescriptor( const ControlIdentity &identity )
+DescriptorPtr Schema::getDescriptor( const ControlIdentity &requested_identity )
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
+    ControlIdentity identity = requested_identity;
+    identity.m_section = ControlIdentity::SectionDescriptorLevel;
+    identity.m_item = 0;
+    identity.m_w_pos = 0;
+    identity.m_h_pos = 0;
 
     DescriptorPtr r;
     auto i = m_descriptor_avdecc_map.find( identity );
@@ -45,8 +55,7 @@ DescriptorPtr Schema::getDescriptor( const ControlIdentity &identity )
     }
     else
     {
-        throw std::runtime_error(
-            formstring( "No such descriptor: ", identity.m_descriptor_type, ",", identity.m_descriptor_index ) );
+        throw SchemaErrorNoSuchDescriptor( identity.m_descriptor_type, identity.m_descriptor_index );
     }
     return r;
 }
@@ -63,19 +72,13 @@ ControlIdentity Schema::getIdentityForAddress( const SchemaAddress &address ) co
     }
     else
     {
-        string a;
-        for ( auto &elem : address )
-        {
-            a.append( "" );
-            a.append( elem );
-        }
-        throw std::runtime_error( formstring( "No descriptor identity for address:", a ) );
+        throw SchemaErrorNoSuchDescriptorForAddress( address );
     }
     return r;
 }
 
 RangedValueBase const *
-    Schema::getRangedValueForDescriptor( ControlIdentity const &identity, int item_num, int w_pos, int h_pos ) const
+    Schema::getRangedValueForControlIdentity( ControlIdentity const &identity, int item_num, int w_pos, int h_pos ) const
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
 
@@ -88,7 +91,7 @@ RangedValueBase const *
         r = d->getName( item_num );
         break;
 
-    case ControlIdentity::SectionItemLevel:
+    case ControlIdentity::SectionDescriptorLevel:
     case ControlIdentity::SectionWPosLevel:
     case ControlIdentity::SectionHPosLevel:
         if ( d->getNumValues() > item_num )
@@ -110,49 +113,80 @@ RangedValueBase const *
 
     if ( !r )
     {
-        throw std::runtime_error(
-            formstring( "No such control value: ", identity.m_descriptor_type, ",", identity.m_descriptor_index ) );
+        if ( d->getNumNames() > 0 )
+        {
+            r = d->getName( 0 );
+        }
+        else
+        {
+            throw SchemaErrorNoSuchControlIdentity( identity );
+        }
     }
+
     return r;
 }
 
-RangedValueBase *Schema::getRangedValueForDescriptor( ControlIdentity const &identity, int item_num, int w_pos, int h_pos )
+RangedValueBase *Schema::getRangedValueForControlIdentity(
+    ControlIdentityComparatorPtr write_validator, ControlIdentity const &identity, int item_num, int w_pos, int h_pos )
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
 
     RangedValueBase *r = 0;
-    DescriptorPtr d = getDescriptor( identity );
+    bool write_access_allowed = true;
 
-    switch ( identity.m_section )
+    if ( write_validator )
     {
-    case ControlIdentity::SectionName:
-        r = d->getName( item_num );
-        break;
-
-    case ControlIdentity::SectionItemLevel:
-    case ControlIdentity::SectionWPosLevel:
-    case ControlIdentity::SectionHPosLevel:
-        if ( d->getNumValues() > item_num )
+        if ( write_validator->containsControl( identity ) )
         {
-            if ( d->getHeight() > h_pos )
-            {
-                if ( d->getWidth() > w_pos )
-                {
-                    r = d->getValue( item_num + identity.m_item, w_pos + identity.m_w_pos, h_pos + identity.m_h_pos )
-                            .m_ranged_value;
-                }
-            }
+            write_access_allowed = false;
         }
-        break;
-    default:
-        r = 0;
-        break;
     }
 
-    if ( !r )
+    if ( write_access_allowed )
     {
-        throw std::runtime_error(
-            formstring( "No such control value: ", identity.m_descriptor_type, ",", identity.m_descriptor_index ) );
+        DescriptorPtr d = getDescriptor( identity );
+
+        switch ( identity.m_section )
+        {
+        case ControlIdentity::SectionName:
+            r = d->getName( item_num );
+            break;
+
+        case ControlIdentity::SectionDescriptorLevel:
+        case ControlIdentity::SectionWPosLevel:
+        case ControlIdentity::SectionHPosLevel:
+            if ( d->getNumValues() > item_num )
+            {
+                if ( d->getHeight() > h_pos )
+                {
+                    if ( d->getWidth() > w_pos )
+                    {
+                        r = d->getValue( item_num + identity.m_item, w_pos + identity.m_w_pos, h_pos + identity.m_h_pos )
+                                .m_ranged_value;
+                    }
+                }
+            }
+            break;
+        default:
+            r = 0;
+            break;
+        }
+
+        if ( !r )
+        {
+            if ( d->getNumNames() > 0 )
+            {
+                r = d->getName( 0 );
+            }
+            else
+            {
+                throw SchemaErrorNoSuchControlIdentity( identity );
+            }
+        }
+    }
+    else
+    {
+        throw SchemaErrorReadOnly( identity );
     }
     return r;
 }
