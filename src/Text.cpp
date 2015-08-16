@@ -124,7 +124,7 @@ void TextProtocolSession::handleSet( Milliseconds current_time_in_milliseconds, 
         if ( doesContainRegex( address.m_value ) )
         {
             TextAddressSet items = getAddressesForRegex( address.m_value );
-            ControlPlane::ChangeNotifierManagerHold hold_notifications_for_other_subscribersp( m_notifier.getManager() );
+            ControlPlane::ChangeNotifierManagerHold hold_notifications_for_other_subscribers( m_notifier.getManager() );
 
             for ( auto const &i : items )
             {
@@ -285,14 +285,28 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
     m_schema.lookupIdentityForAddress( identity, address );
 
     std::stringstream response;
-    response << formstring( "?{'", address, "'" );
+    response << formstring( "?{'", escapeString( address.m_value ), "'" );
 
     if ( identity.m_section == ControlIdentity::SectionDescriptorLevel )
     {
         DescriptorPtr d = m_schema.getTarget().getDescriptor( identity );
 
-        response << ": [";
-
+        response << ": { ";
+        response << "'control_type' : 0x" << std::hex << d->getAvdeccControlType() << std::dec << ", ";
+        response << "'control_value_type' : " << d->getAvdeccControlValueType() << ", ";
+        response << "'name' : '" << escapeString( d->getName()->getValue() ) << "', ";
+        response << "'description' : '" << escapeString( d->getDescription() ) << "', ";
+        response << "'read_only' : '";
+        if ( m_write_access->containsControl( identity ) )
+        {
+            response << "true";
+        }
+        else
+        {
+            response << "false";
+        }
+        response << "', ";
+        response << "'items' : [ ";
         for ( size_t item = 0; item < d->getNumValues(); ++item )
         {
             ControlValue const &v = d->getValue( item );
@@ -301,7 +315,7 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
 
             if ( item < d->getNumValues() - 1 )
             {
-                response << ", ";
+                response << "} , ";
             }
         }
         response << "]";
@@ -316,7 +330,7 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
         const RangedValueBase *v = m_schema.getTarget().getRangedValueForControlIdentity( identity );
         response << ":" << describeRangedValue( formstring( "item_", identity.m_h_pos + 1, "_", identity.m_w_pos + 1 ), *v );
     }
-    response << "}";
+    response << "}}";
     m_io.sendLine( response.str() );
 }
 
@@ -349,26 +363,26 @@ string TextProtocolSession::describeRangedValue( const std::string &name, const 
     string response;
     if ( v.getStorageType() == EncodingType::ENCODING_STRING64 || v.getStorageType() == EncodingType::ENCODING_STRING406 )
     {
-        response = formstring( "[ { 'value' : '", v.getUnencodedValueString( false ), "'", "} ]" );
+        response = formstring( "[ { 'value' : '", escapeString( v.getUnencodedValueString( false ) ), "'", "} ]" );
     }
     else
     {
         response = formstring(
             "{"
             " 'name' : '",
-            name,
+            escapeString( name ),
             "', 'value' : '",
-            v.getUnencodedValueString( false ),
+            escapeString( v.getUnencodedValueString( false ) ),
             "', 'minimum' : '",
-            v.getUnencodedMinimumString( false ),
+            escapeString( v.getUnencodedMinimumString( false ) ),
             "', 'maximum' : '",
-            v.getUnencodedMaximumString( false ),
+            escapeString( v.getUnencodedMaximumString( false ) ),
             "', 'default' : '",
-            v.getUnencodedDefaultString( false ),
+            escapeString( v.getUnencodedDefaultString( false ) ),
             "', 'step' : '",
-            v.getUnencodedStepString( false ),
+            escapeString( v.getUnencodedStepString( false ) ),
             "', 'units' : '",
-            v.getUnitsSuffix(),
+            escapeString( v.getUnitsSuffix() ),
             "'",
             "}" );
     }
