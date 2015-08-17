@@ -3,7 +3,7 @@
 #include "World.hpp"
 #include "AvdeccSchema.hpp"
 #include "ControlIdentity.hpp"
-#include "Descriptor.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {

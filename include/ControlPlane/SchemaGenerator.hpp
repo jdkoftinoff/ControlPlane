@@ -2,14 +2,13 @@
 
 #include "World.hpp"
 #include "RangedValue.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
-#include "ControlDescriptor.hpp"
-#include "MatrixDescriptor.hpp"
+#include "Descriptors.hpp"
 #include "ControlContainer.hpp"
 
 namespace ControlPlane
 {
+
+using Descriptor::DescriptorCounts;
 
 class SchemaGenerator
 {

@@ -1,22 +1,25 @@
 #pragma once
 
-#include "World.hpp"
-#include "AvdeccSchema.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
+#include "../World.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
-
-class MatrixDescriptor : public Descriptor
+namespace Descriptor
 {
-  public:
-    MatrixDescriptor( DescriptorCounts &counts,
-                      uint64_t avdecc_control_type,
-                      string description,
-                      uint16_t avdecc_control_value_type );
 
-    virtual ~MatrixDescriptor() {}
+class Matrix : public DescriptorBase
+{
+  protected:
+    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
+    {
+        m_avdecc_descriptor_index = new_descriptor_index;
+    }
+
+  public:
+    Matrix( DescriptorCounts &counts, uint64_t avdecc_control_type, string description, uint16_t avdecc_control_value_type );
+
+    virtual ~Matrix() {}
 
     uint16_t getNumNames() const override { return 1; }
 
@@ -57,7 +60,10 @@ class MatrixDescriptor : public Descriptor
 
     void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
 
-  private:
+    void storeToPDU( FixedBuffer &pdu ) const override;
+
+    void collectOwnedDescriptors( DescriptorCounts &counts ) override;
+
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
@@ -65,13 +71,13 @@ class MatrixDescriptor : public Descriptor
     uint16_t m_avdecc_control_value_type;
     DescriptorString m_object_name;
     vector<vector<vector<ControlValue> > > m_control_point_values;
+    vector<MatrixSignalPtr> m_matrix_signals;
 };
 
-using MatrixDescriptorPtr = shared_ptr<MatrixDescriptor>;
-
 template <typename... T>
-MatrixDescriptorPtr makeMatrixDescriptor( T &&... args )
+MatrixPtr makeMatrix( T &&... args )
 {
-    return MatrixDescriptorPtr( new MatrixDescriptor( args... ) );
+    return MatrixPtr( new Matrix( args... ) );
+}
 }
 }

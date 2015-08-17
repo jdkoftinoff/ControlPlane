@@ -1,10 +1,11 @@
 #include "ControlPlane/World.hpp"
-#include "ControlPlane/JackDescriptor.hpp"
+#include "ControlPlane/Descriptor/Stream.hpp"
 
 namespace ControlPlane
 {
-
-const DescriptorString *JackDescriptor::getName( size_t name_index ) const
+namespace Descriptor
+{
+const DescriptorString *Stream::getName( size_t name_index ) const
 {
     DescriptorString const *r = nullptr;
     if ( name_index == 0 )
@@ -14,7 +15,7 @@ const DescriptorString *JackDescriptor::getName( size_t name_index ) const
     return r;
 }
 
-DescriptorString *JackDescriptor::getName( size_t name_index )
+DescriptorString *Stream::getName( size_t name_index )
 {
     DescriptorString *r = nullptr;
     if ( name_index == 0 )
@@ -24,7 +25,7 @@ DescriptorString *JackDescriptor::getName( size_t name_index )
     return r;
 }
 
-bool JackDescriptor::setName( std::string val, size_t name_index )
+bool Stream::setName( std::string val, size_t name_index )
 {
     bool r = false;
     if ( name_index == 0 )
@@ -32,5 +33,6 @@ bool JackDescriptor::setName( std::string val, size_t name_index )
         r = m_object_name.setValue( val );
     }
     return r;
+}
 }
 }

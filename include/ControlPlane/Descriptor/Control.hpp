@@ -1,15 +1,22 @@
 #pragma once
 
-#include "World.hpp"
-#include "AvdeccSchema.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
+#include "../World.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
-
-class ControlDescriptor : public Descriptor
+namespace Descriptor
 {
+
+class Control : public DescriptorBase
+{
+  protected:
+    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
+    {
+        m_avdecc_descriptor_index = new_descriptor_index;
+    }
+
+  private:
     template <typename T>
     static void push_back_multi( vector<T> &vec, T first )
     {
@@ -24,29 +31,23 @@ class ControlDescriptor : public Descriptor
     }
 
   public:
-    ControlDescriptor( DescriptorCounts &counts,
-                       uint64_t avdecc_control_type,
-                       string description,
-                       uint16_t avdecc_control_value_type,
-                       ControlValue first );
+    Control( uint64_t avdecc_control_type, string description, uint16_t avdecc_control_value_type, ControlValue first );
 
     template <typename... ArgT>
-    ControlDescriptor( DescriptorCounts &counts,
-                       uint64_t avdecc_control_type,
-                       string description,
-                       uint16_t avdecc_control_value_type,
-                       ControlValue first,
-                       ArgT &&... args )
+    Control( uint64_t avdecc_control_type,
+             string description,
+             uint16_t avdecc_control_value_type,
+             ControlValue first,
+             ArgT &&... args )
         : m_avdecc_control_type( avdecc_control_type )
-        , m_avdecc_descriptor_type( 0x001a )
-        , m_avdecc_descriptor_index( counts.getCountForDescriptorTypeAndIncrement( m_avdecc_descriptor_type ) )
+        , m_avdecc_descriptor_type( AVDECC_DESCRIPTOR_CONTROL )
         , m_description( description )
         , m_avdecc_control_value_type( avdecc_control_value_type )
     {
         push_back_multi( m_control_point_values, first, args... );
     }
 
-    virtual ~ControlDescriptor() {}
+    virtual ~Control() {}
 
     uint16_t getNumNames() const override { return 1; }
 
@@ -81,7 +82,8 @@ class ControlDescriptor : public Descriptor
 
     void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
 
-  private:
+    void storeToPDU( FixedBuffer &pdu ) const override { /* TODO */}
+
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
@@ -91,11 +93,10 @@ class ControlDescriptor : public Descriptor
     vector<ControlValue> m_control_point_values;
 };
 
-using ControlDescriptorPtr = shared_ptr<ControlDescriptor>;
-
 template <typename... T>
-ControlDescriptorPtr makeControlDescriptor( T &&... args )
+ControlPtr makeControl( T &&... args )
 {
-    return ControlDescriptorPtr( new ControlDescriptor( args... ) );
+    return ControlPtr( new Control( args... ) );
+}
 }
 }

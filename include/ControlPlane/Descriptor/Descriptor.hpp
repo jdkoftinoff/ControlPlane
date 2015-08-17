@@ -1,18 +1,25 @@
 #pragma once
 
-#include "World.hpp"
-#include "ControlValue.hpp"
-#include "ControlIdentity.hpp"
-#include "Values.hpp"
-#include "ControlIdentityComparator.hpp"
+#include "../World.hpp"
+#include "../ControlValue.hpp"
+#include "../ControlIdentity.hpp"
+#include "../Values.hpp"
+#include "../ControlIdentityComparator.hpp"
+#include "../FixedBuffer.hpp"
+#include "DescriptorCounts.hpp"
 
 namespace ControlPlane
 {
-
-class Descriptor
+namespace Descriptor
 {
+
+class DescriptorBase
+{
+  protected:
+    virtual void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) = 0;
+
   public:
-    virtual ~Descriptor() {}
+    virtual ~DescriptorBase() {}
     virtual uint16_t getNumNames() const = 0;
     virtual DescriptorString const *getName( size_t name_index = 0 ) const = 0;
     virtual DescriptorString *getName( size_t name_index = 0 ) = 0;
@@ -28,6 +35,11 @@ class Descriptor
     virtual ControlValue &getValue( size_t item_num, size_t w = 0, size_t h = 0 ) = 0;
     virtual const ControlValue &getValue( size_t item_num, size_t w = 0, size_t h = 0 ) const = 0;
     virtual void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) = 0;
+    virtual void storeToPDU( FixedBuffer &pdu ) const = 0;
+    virtual void collectOwnedDescriptors( DescriptorCounts &counts )
+    {
+        setAvdeccDescriptorIndex( counts.getCountForDescriptorTypeAndIncrement( getAvdeccDescriptorType() ) );
+    }
 
     ControlIdentity getControlIdentity() const
     {
@@ -63,10 +75,11 @@ class Descriptor
     }
 };
 
-using DescriptorPtr = shared_ptr<Descriptor>;
+using DescriptorPtr = shared_ptr<DescriptorBase>;
 using DescriptorAddressMap = map<SchemaAddressElement, DescriptorPtr>;
 using DescriptorAvdeccMap = map<ControlIdentity, DescriptorPtr>;
 
 using CpIndex = vector<int>;
 using DescriptorCpIndexMap = map<CpIndex, DescriptorPtr>;
+}
 }

@@ -26,7 +26,5 @@ using ControlStringValue = RangedValue<UnitsCode::Unitless, 0, 0, 0, 0, 0, Contr
 
 using VuMeterDbFsPeak = RangedValue<UnitsCode::LevelDbFsPeak, -128, 0, 0, 1, -1, int8_t, float>;
 
-using EUI64 = RangedValueEUI64;
-
 using DescriptorString = RangedValue<UnitsCode::Unitless, 0, 0, 0, 0, 0, ControlPlane::AvdeccNameString, std::string>;
 }

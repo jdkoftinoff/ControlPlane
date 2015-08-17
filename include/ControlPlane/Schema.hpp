@@ -2,16 +2,16 @@
 
 #include "World.hpp"
 #include "RangedValue.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
-#include "ControlDescriptor.hpp"
-#include "MatrixDescriptor.hpp"
+#include "Descriptors.hpp"
 #include "ControlContainer.hpp"
 #include "ChangeNotification.hpp"
 #include "ChangeNotifierManager.hpp"
 
 namespace ControlPlane
 {
+
+using Descriptor::DescriptorPtr;
+using DescriptorAvdeccMap = Descriptor::DescriptorAvdeccMap;
 
 inline std::string schemaAddressToString( SchemaAddress const &a )
 {

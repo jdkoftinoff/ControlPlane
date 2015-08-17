@@ -1,18 +1,24 @@
 #pragma once
 
-#include "World.hpp"
-#include "AvdeccSchema.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
+#include "../World.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
-
-class JackDescriptor : public Descriptor
+namespace Descriptor
 {
+
+class Jack : public DescriptorBase
+{
+  protected:
+    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
+    {
+        m_avdecc_descriptor_index = new_descriptor_index;
+    }
+
   public:
-    JackDescriptor( DescriptorCounts &counts, string description );
-    virtual ~JackDescriptor() {}
+    Jack( uint16_t descriptor_type, string description );
+    virtual ~Jack() {}
 
     uint16_t getNumNames() const override { return 1; }
 
@@ -47,18 +53,35 @@ class JackDescriptor : public Descriptor
 
     void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
 
-  private:
+    void storeToPDU( FixedBuffer &pdu ) const override;
+
+    void collectOwnedDescriptors( DescriptorCounts &counts ) override;
+
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
     DescriptorString m_object_name;
+    std::vector<ControlPtr> m_controls;
 };
 
-using JackDescriptorPtr = shared_ptr<JackDescriptor>;
+class JackInput : public Jack
+{
+};
+
+class JackOutput : public Jack
+{
+};
 
 template <typename... T>
-JackDescriptorPtr makeJackDescriptor( T &&... args )
+JackInputPtr makeJackInput( T &&... args )
 {
-    return JackDescriptorPtr( new JackDescriptor( args... ) );
+    return JackInputPtr( new JackInput( args... ) );
+}
+
+template <typename... T>
+JackOutputPtr makeJackOutput( T &&... args )
+{
+    return JackOutputPtr( new JackOutput( args... ) );
+}
 }
 }

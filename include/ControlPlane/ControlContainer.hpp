@@ -1,7 +1,7 @@
 #pragma once
 
 #include "World.hpp"
-#include "Descriptor.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
@@ -10,6 +10,8 @@ class ControlContainer;
 
 using ControlContainerPtr = shared_ptr<ControlContainer>;
 using ControlContainerMap = map<SchemaAddressElement, ControlContainerPtr>;
+using DescriptorPtr = Descriptor::DescriptorPtr;
+using DescriptorAddressMap = Descriptor::DescriptorAddressMap;
 
 ///
 /// \brief The ControlContainer class

@@ -1,18 +1,23 @@
 #pragma once
 
-#include "World.hpp"
-#include "AvdeccSchema.hpp"
-#include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
+#include "../World.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
-
-class StreamDescriptor : public Descriptor
+namespace Descriptor
 {
+class Stream : public DescriptorBase
+{
+  protected:
+    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
+    {
+        m_avdecc_descriptor_index = new_descriptor_index;
+    }
+
   public:
-    StreamDescriptor( DescriptorCounts &counts, string description );
-    virtual ~StreamDescriptor() {}
+    Stream( DescriptorCounts &counts, string description );
+    virtual ~Stream() {}
 
     uint16_t getNumNames() const override { return 1; }
 
@@ -47,18 +52,28 @@ class StreamDescriptor : public Descriptor
 
     void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override {}
 
-  private:
+    void storeToPDU( FixedBuffer &pdu ) const override;
+
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
     DescriptorString m_object_name;
 };
 
-using StreamDescriptorPtr = shared_ptr<StreamDescriptor>;
+class StreamInput : public Stream
+{
+  public:
+};
+
+class StreamOutput : public Stream
+{
+  public:
+};
 
 template <typename... T>
-StreamDescriptorPtr makeStreamDescriptor( T &&... args )
+StreamPtr makeStream( T &&... args )
 {
-    return StreamDescriptorPtr( new StreamDescriptor( args... ) );
+    return StreamPtr( new Stream( args... ) );
+}
 }
 }

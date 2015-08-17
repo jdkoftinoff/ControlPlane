@@ -1,26 +1,31 @@
 #pragma once
 
-#include "World.hpp"
-#include "AvdeccSchema.hpp"
+#include "../World.hpp"
 #include "Descriptor.hpp"
-#include "DescriptorCounts.hpp"
-#include "Values.hpp"
+#include "Descriptors.hpp"
 
 namespace ControlPlane
 {
-
-class EntityDescriptor : public Descriptor
+namespace Descriptor
 {
+
+class Entity : public DescriptorBase
+{
+  protected:
+    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
+    {
+        m_avdecc_descriptor_index = new_descriptor_index;
+    }
+
   public:
-    EntityDescriptor( DescriptorCounts &counts,
-                      std::string description,
-                      DescriptorString *entity_name,
-                      DescriptorString *group_name,
-                      DescriptorString *firmware_version,
-                      DescriptorString *serial_number,
-                      EUI64 *entity_id,
-                      EUI64 *entity_model_id );
-    virtual ~EntityDescriptor() {}
+    Entity( std::string description,
+            DescriptorString *entity_name,
+            DescriptorString *group_name,
+            DescriptorString *firmware_version,
+            DescriptorString *serial_number,
+            RangedValueEUI64 *entity_id,
+            RangedValueEUI64 *entity_model_id );
+    virtual ~Entity() {}
 
     uint16_t getNumNames() const override { return m_names.size(); }
 
@@ -52,6 +57,10 @@ class EntityDescriptor : public Descriptor
 
     void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) override;
 
+    void storeToPDU( FixedBuffer &pdu ) const override;
+
+    void collectOwnedDescriptors( DescriptorCounts &counts ) override;
+
     enum
     {
         ItemForName = 0,
@@ -62,27 +71,26 @@ class EntityDescriptor : public Descriptor
         ItemForEntityModelId
     };
 
-  private:
     uint16_t m_avdecc_descriptor_type;
     uint16_t m_avdecc_descriptor_index;
     string m_description;
 
     std::vector<ControlValue> m_items;
     std::vector<DescriptorString *> m_names;
+
+    std::vector<ConfigurationPtr> m_configurations;
 };
 
-using EntityDescriptorPtr = shared_ptr<EntityDescriptor>;
-
-inline EntityDescriptorPtr makeEntityDescriptor( DescriptorCounts &counts,
-                                                 std::string description,
-                                                 DescriptorString *entity_name,
-                                                 DescriptorString *group_name,
-                                                 DescriptorString *firmware_version,
-                                                 DescriptorString *serial_number,
-                                                 EUI64 *entity_id,
-                                                 EUI64 *entity_model_id )
+inline EntityPtr makeEntity( std::string description,
+                             DescriptorString *entity_name,
+                             DescriptorString *group_name,
+                             DescriptorString *firmware_version,
+                             DescriptorString *serial_number,
+                             RangedValueEUI64 *entity_id,
+                             RangedValueEUI64 *entity_model_id )
 {
-    return EntityDescriptorPtr( new EntityDescriptor(
-        counts, description, entity_name, group_name, firmware_version, serial_number, entity_id, entity_model_id ) );
+    return EntityPtr(
+        new Entity( description, entity_name, group_name, firmware_version, serial_number, entity_id, entity_model_id ) );
+}
 }
 }

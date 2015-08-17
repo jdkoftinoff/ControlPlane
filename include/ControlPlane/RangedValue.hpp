@@ -40,6 +40,12 @@ class RangedValueBase
     virtual EncodingType getEncodingType() const = 0;
 
     ///
+    /// \brief isReadOnly
+    /// \return true if the value is not to be set by the user
+    ///
+    virtual bool isReadOnly() const { return false; }
+
+    ///
     /// \brief setUnencodedValueString
     ///
     /// If storage type and encoding type are both string, then set

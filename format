@@ -1,1 +1,1 @@
-clang-format -i include/ControlPlane/* src/*.cpp
+clang-format -i include/ControlPlane/* include/ControlPlane/Descriptor/* src/*.cpp

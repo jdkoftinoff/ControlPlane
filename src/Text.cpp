@@ -297,7 +297,24 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
         response << "'name' : '" << escapeString( d->getName()->getValue() ) << "', ";
         response << "'description' : '" << escapeString( d->getDescription() ) << "', ";
         response << "'read_only' : '";
-        if ( m_write_access->containsControl( identity ) )
+
+        bool ro = false;
+
+        ro = m_write_access->containsControl( identity );
+
+        if ( !ro )
+        {
+            for ( size_t item = 0; item < d->getNumValues(); ++item )
+            {
+                if ( d->getValue( item ).m_ranged_value->isReadOnly() )
+                {
+                    ro = true;
+                    break;
+                }
+            }
+        }
+
+        if ( ro )
         {
             response << "true";
         }
