@@ -1,9 +1,12 @@
 #pragma once
 
 #ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <WinSock2.h>
 #include <windows.h>
 #endif
-
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -17,6 +20,7 @@
 #include <valarray>
 #include <algorithm>
 #include <functional>
+#include <limits>
 #include <initializer_list>
 #include <memory.h>
 #include <map>
