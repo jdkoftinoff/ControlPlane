@@ -1676,7 +1676,12 @@ class RangedValueEUI64 : public RangedValueBase
     ///
     bool setUnencodedValueString( string const &sv, bool force = false ) override
     {
-        std::istringstream is( sv );
+        std::string svp = sv;
+        if ( svp[0] == '0' && svp[1] == 'x' )
+        {
+            svp = svp.substr( 2 );
+        }
+        std::istringstream is( svp );
         is >> std::hex;
         uint64_t v = 0;
         is >> v;
@@ -1756,14 +1761,14 @@ class RangedValueEUI64 : public RangedValueBase
     string getUnencodedValueString( bool enable_units = true ) const override
     {
         std::ostringstream ss;
-        ss << std::hex;
+        ss << "0x" << std::hex;
         ss << m_value;
         return ss.str();
     }
 
     string getUnencodedMinimumString( bool enable_units = true ) const override { return "0"; }
 
-    string getUnencodedMaximumString( bool enable_units = true ) const override { return "ffffffffffffffff"; }
+    string getUnencodedMaximumString( bool enable_units = true ) const override { return "0xffffffffffffffff"; }
 
     string getUnencodedDefaultString( bool enable_units = true ) const override { return "0"; }
 
@@ -2029,10 +2034,21 @@ class RangedValueBool : public RangedValueBase
     ///
     bool setUnencodedValueString( string const &sv, bool force = false ) override
     {
-        std::istringstream is( sv );
-        is >> std::boolalpha;
-        bool v = 0;
-        is >> v;
+        bool v = false;
+        if ( sv == "true" || sv == "'true'" || sv == "\"true\"" || sv == "True" || sv == "'True'" || sv == "\"True\""
+             || sv == "1" || sv == "'1'" || sv == "\"1\"" )
+        {
+            v = true;
+        }
+        else if ( sv == "false" || sv == "'false'" || sv == "\"false\"" || sv == "False" || sv == "'False'" || sv == "\"False\""
+                  || sv == "0" || sv == "'0'" || sv == "\"0\"" )
+        {
+            v = false;
+        }
+        else
+        {
+            throw std::runtime_error( "bool parse error" );
+        }
         return setValue( v, force );
     }
 

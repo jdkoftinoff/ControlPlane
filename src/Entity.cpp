@@ -99,18 +99,8 @@ void Entity::storeToPDU( ControlPlane::FixedBuffer &pdu ) const
     pdu.putAvdeccString( m_items[ItemForFirmwareVersion].m_ranged_value->getUnencodedValueString() );
     pdu.putAvdeccString( m_items[ItemForGroup].m_ranged_value->getUnencodedValueString() );
     pdu.putAvdeccString( m_items[ItemForSerialNumber].m_ranged_value->getUnencodedValueString() );
-    pdu.putDoublet( (uint16_t)m_configurations.size() ); // configurations_count
-    pdu.putDoublet( 0 );                                 // current_configuration
-}
-
-void Entity::collectOwnedDescriptors( DescriptorCounts &counts )
-{
-    DescriptorBase::collectOwnedDescriptors( counts );
-    for ( auto &i : m_configurations )
-    {
-        i->collectOwnedDescriptors( counts );
-        counts.addConfiguration();
-    }
+    pdu.putDoublet( (uint16_t)1 ); // configurations_count
+    pdu.putDoublet( 0 );           // current_configuration
 }
 }
 }

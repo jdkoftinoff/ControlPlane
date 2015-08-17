@@ -18,6 +18,8 @@ class Entity : public DescriptorBase
     }
 
   public:
+    static const uint16_t descriptor_type = AVDECC_DESCRIPTOR_ENTITY;
+
     Entity( std::string description,
             DescriptorString *entity_name,
             DescriptorString *group_name,
@@ -59,8 +61,6 @@ class Entity : public DescriptorBase
 
     void storeToPDU( FixedBuffer &pdu ) const override;
 
-    void collectOwnedDescriptors( DescriptorCounts &counts ) override;
-
     enum
     {
         ItemForName = 0,
@@ -77,8 +77,6 @@ class Entity : public DescriptorBase
 
     std::vector<ControlValue> m_items;
     std::vector<DescriptorString *> m_names;
-
-    std::vector<ConfigurationPtr> m_configurations;
 };
 
 inline EntityPtr makeEntity( std::string description,

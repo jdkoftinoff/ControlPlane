@@ -33,70 +33,15 @@ void Configuration::storeToPDU( FixedBuffer &pdu ) const
     pdu.putAvdeccString( m_object_name.getValue() );
     pdu.putDoublet( 0xffff );
 
-    size_t descriptor_counts_count = 0;
-
-    descriptor_counts_count += m_audio_unit.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_stream_input.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_audio_unit.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_stream_input.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_stream_output.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_jack_input.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_jack_output.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_avb_interface.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_clock_source.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_control.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_signal_selector.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_mixer.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_matrix.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_locale.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_memory_object.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_clock_domain.size() > 0 ? 1 : 0;
-    descriptor_counts_count += m_control_block.size() > 0 ? 1 : 0;
+    size_t descriptor_counts_count = getChildDescriptors().size();
 
     pdu.putDoublet( (uint16_t)descriptor_counts_count );
     pdu.putDoublet( 74 );
 
-    putDescriptorCounts( pdu, m_audio_unit );
-    putDescriptorCounts( pdu, m_stream_input );
-    putDescriptorCounts( pdu, m_audio_unit );
-    putDescriptorCounts( pdu, m_stream_input );
-    putDescriptorCounts( pdu, m_stream_output );
-    putDescriptorCounts( pdu, m_jack_input );
-    putDescriptorCounts( pdu, m_jack_output );
-    putDescriptorCounts( pdu, m_avb_interface );
-    putDescriptorCounts( pdu, m_clock_source );
-    putDescriptorCounts( pdu, m_control );
-    putDescriptorCounts( pdu, m_signal_selector );
-    putDescriptorCounts( pdu, m_mixer );
-    putDescriptorCounts( pdu, m_matrix );
-    putDescriptorCounts( pdu, m_locale );
-    putDescriptorCounts( pdu, m_memory_object );
-    putDescriptorCounts( pdu, m_clock_domain );
-    putDescriptorCounts( pdu, m_control_block );
-}
-
-void Configuration::collectOwnedDescriptors( DescriptorCounts &counts )
-{
-    DescriptorBase::collectOwnedDescriptors( counts );
-
-    collectOwnedDescriptorsInVector( counts, m_audio_unit );
-    collectOwnedDescriptorsInVector( counts, m_stream_input );
-
-    collectOwnedDescriptorsInVector( counts, m_audio_unit );
-    collectOwnedDescriptorsInVector( counts, m_stream_input );
-    collectOwnedDescriptorsInVector( counts, m_stream_output );
-    collectOwnedDescriptorsInVector( counts, m_jack_input );
-    collectOwnedDescriptorsInVector( counts, m_jack_output );
-    collectOwnedDescriptorsInVector( counts, m_avb_interface );
-    collectOwnedDescriptorsInVector( counts, m_clock_source );
-    collectOwnedDescriptorsInVector( counts, m_control );
-    collectOwnedDescriptorsInVector( counts, m_signal_selector );
-    collectOwnedDescriptorsInVector( counts, m_mixer );
-    collectOwnedDescriptorsInVector( counts, m_matrix );
-    collectOwnedDescriptorsInVector( counts, m_locale );
-    collectOwnedDescriptorsInVector( counts, m_memory_object );
-    collectOwnedDescriptorsInVector( counts, m_clock_domain );
-    collectOwnedDescriptorsInVector( counts, m_control_block );
+    for ( auto const &i : getChildDescriptors() )
+    {
+        putDescriptorCounts( pdu, i.second );
+    }
 }
 }
 }

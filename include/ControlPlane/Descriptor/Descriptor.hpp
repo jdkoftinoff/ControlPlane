@@ -36,43 +36,39 @@ class DescriptorBase
     virtual const ControlValue &getValue( size_t item_num, size_t w = 0, size_t h = 0 ) const = 0;
     virtual void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) = 0;
     virtual void storeToPDU( FixedBuffer &pdu ) const = 0;
-    virtual void collectOwnedDescriptors( DescriptorCounts &counts )
+    virtual void collectOwnedDescriptors( DescriptorCounts &counts );
+
+    ControlIdentity getControlIdentity() const;
+
+    ControlIdentity getControlIdentityForItem( uint16_t item_num ) const;
+    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos ) const;
+
+    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos, uint16_t w_pos ) const;
+
+    ControlIdentity getControlIdentityForName( uint16_t name_num = 0 ) const;
+
+    void addChildDescriptor( std::shared_ptr<DescriptorBase> d );
+
+    size_t getNumChildDescriptorsForType( uint16_t type ) const;
+
+    template <typename DescriptorT>
+    std::vector<std::shared_ptr<DescriptorT> > *getChildDescriptorsFor()
     {
-        setAvdeccDescriptorIndex( counts.getCountForDescriptorTypeAndIncrement( getAvdeccDescriptorType() ) );
+        std::vector<std::shared_ptr<DescriptorT> > *getChildDescriptorsForType( DescriptorT::descriptor_type );
     }
 
-    ControlIdentity getControlIdentity() const
+    std::vector<std::shared_ptr<DescriptorBase> > *getChildDescriptorsForType( uint16_t type );
+    const std::vector<std::shared_ptr<DescriptorBase> > *getChildDescriptorsForType( uint16_t type ) const;
+
+    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > &getChildDescriptors() { return m_child_descriptors; }
+
+    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > const &getChildDescriptors() const
     {
-        ControlIdentity r = ControlIdentity{getAvdeccDescriptorType(), getAvdeccDescriptorIndex()};
-        return r;
+        return m_child_descriptors;
     }
 
-    ControlIdentity getControlIdentityForItem( uint16_t item_num ) const
-    {
-        ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionDescriptorLevel, item_num );
-        return r;
-    }
-    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos ) const
-    {
-        ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionWPosLevel, item_num, h_pos );
-        return r;
-    }
-
-    ControlIdentity getControlIdentityForItem( uint16_t item_num, uint16_t h_pos, uint16_t w_pos ) const
-    {
-        ControlIdentity r = ControlIdentity(
-            getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionHPosLevel, item_num, h_pos, w_pos );
-        return r;
-    }
-
-    ControlIdentity getControlIdentityForName( uint16_t name_num = 0 ) const
-    {
-        ControlIdentity r
-            = ControlIdentity( getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionName, name_num );
-        return r;
-    }
+  private:
+    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > m_child_descriptors;
 };
 
 using DescriptorPtr = shared_ptr<DescriptorBase>;

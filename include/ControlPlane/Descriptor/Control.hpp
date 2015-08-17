@@ -31,6 +31,8 @@ class Control : public DescriptorBase
     }
 
   public:
+    static const uint16_t descriptor_type = AVDECC_DESCRIPTOR_CONTROL;
+
     Control( uint64_t avdecc_control_type, string description, uint16_t avdecc_control_value_type, ControlValue first );
 
     template <typename... ArgT>

@@ -90,55 +90,55 @@ class ExampleSchemaGenerator : public SchemaGenerator
             addOutputChannel( schema_output, configuration, chan, &m_processing_settings->m_output[chan] );
         }
 
-        entity->m_configurations.push_back( configuration );
+        entity->addChildDescriptor( configuration );
         entity->collectOwnedDescriptors( m_counts );
 
         return m_root;
     }
 
     ControlContainerPtr
-        addInputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, InputProcessing *v )
+        addInputChannel( ControlContainerPtr root, Descriptor::DescriptorPtr owner, int chan, InputProcessing *v )
     {
         string chan_name = formstring( chan + 1 );
         string description = formstring( "Input ", chan_name );
 
         ControlContainerPtr schema_chan = root->addItem( chan_name );
 
-        schema_chan->addItem( "gain", makeGainControlDescriptor( config, formstring( description, " Gain" ), &v->m_gain ) );
+        schema_chan->addItem( "gain", makeGainControlDescriptor( owner, formstring( description, " Gain" ), &v->m_gain ) );
 
-        schema_chan->addItem( "mute", makeMuteControlDescriptor( config, formstring( description, " Mute" ), &v->m_mute ) );
+        schema_chan->addItem( "mute", makeMuteControlDescriptor( owner, formstring( description, " Mute" ), &v->m_mute ) );
 
         return schema_chan;
     }
 
     ControlContainerPtr
-        addOutputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, OutputProcessing *v )
+        addOutputChannel( ControlContainerPtr root, Descriptor::DescriptorPtr owner, int chan, OutputProcessing *v )
     {
         string chan_name = formstring( chan + 1 );
         string description = formstring( "Output ", chan_name );
 
         ControlContainerPtr schema_chan = root->addItem( chan_name );
 
-        schema_chan->addItem( "gain", makeGainControlDescriptor( config, formstring( description, " Gain" ), &v->m_gain ) );
+        schema_chan->addItem( "gain", makeGainControlDescriptor( owner, formstring( description, " Gain" ), &v->m_gain ) );
 
-        schema_chan->addItem( "mute", makeMuteControlDescriptor( config, formstring( description, " Mute" ), &v->m_mute ) );
+        schema_chan->addItem( "mute", makeMuteControlDescriptor( owner, formstring( description, " Mute" ), &v->m_mute ) );
 
         return schema_chan;
     }
 
-    DescriptorPtr makeMuteControlDescriptor( Descriptor::ConfigurationPtr &config, string description, Mute *value )
+    DescriptorPtr makeMuteControlDescriptor( Descriptor::DescriptorPtr &owner, string description, Mute *value )
     {
         Descriptor::ControlPtr control = Descriptor::makeControl(
             AVDECC_AEM_CONTROL_TYPE_MUTE, description, AVDECC_CONTROL_VALUE_LINEAR_UINT8, ControlValue{"mute", value} );
-        config->m_control.push_back( control );
+        owner->addChildDescriptor( control );
         return control;
     }
 
-    DescriptorPtr makeGainControlDescriptor( Descriptor::ConfigurationPtr &config, string description, Gain *value )
+    DescriptorPtr makeGainControlDescriptor( Descriptor::DescriptorPtr &owner, string description, Gain *value )
     {
         Descriptor::ControlPtr control = Descriptor::makeControl(
             AVDECC_AEM_CONTROL_TYPE_GAIN, description, AVDECC_CONTROL_VALUE_LINEAR_INT32, ControlValue{"gain", value} );
-        config->m_control.push_back( control );
+        owner->addChildDescriptor( control );
         return control;
     }
 };
@@ -188,7 +188,6 @@ int main( int argc, char **argv )
 
         ControlContainerPtr top_controls = ControlContainer::create();
 
-        DescriptorCounts counts;
         ControlIdentityComparatorSetPtr write_access = std::make_shared<ControlIdentityComparatorSet>();
         ExampleSchemaGenerator generator( top_controls, &processing_settings, write_access );
 
