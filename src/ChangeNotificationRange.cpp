@@ -54,5 +54,4 @@ bool ChangeNotificationRange::containsDescriptor( const ControlIdentity &d ) con
     }
     return r;
 }
-
 }

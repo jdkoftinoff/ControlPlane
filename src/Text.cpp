@@ -330,7 +330,7 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
 
             response << describeRangedValue( v.m_name, *v.m_ranged_value );
 
-            if ( item+1 < d->getNumValues() )
+            if ( item + 1 < d->getNumValues() )
             {
                 response << "} , ";
             }

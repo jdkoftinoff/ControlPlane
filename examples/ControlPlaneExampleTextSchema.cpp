@@ -15,7 +15,6 @@ struct InputProcessing
     Gain m_gain;
 };
 
-
 /** OutputProcessing
  */
 struct OutputProcessing
@@ -24,13 +23,11 @@ struct OutputProcessing
     Gain m_gain;
 };
 
-
 struct ProcessingSnapshot
 {
     std::array<InputProcessing, 8> m_input;
     std::array<OutputProcessing, 24> m_output;
 };
-
 
 struct EntityInfo
 {
@@ -42,10 +39,15 @@ struct EntityInfo
     RangedValueEUI64 m_entity_model_id;
 };
 
-
 inline Descriptor::EntityPtr makeEntity( std::string description, EntityInfo *entity_info )
 {
-    Descriptor::EntityPtr entity = Descriptor::makeEntity("Example",&entity_info->m_entity_name,&entity_info->m_entity_group,&entity_info->m_firmware_version,&entity_info->m_serial_number,&entity_info->m_entity_id,&entity_info->m_entity_model_id);
+    Descriptor::EntityPtr entity = Descriptor::makeEntity( "Example",
+                                                           &entity_info->m_entity_name,
+                                                           &entity_info->m_entity_group,
+                                                           &entity_info->m_firmware_version,
+                                                           &entity_info->m_serial_number,
+                                                           &entity_info->m_entity_id,
+                                                           &entity_info->m_entity_model_id );
     return entity;
 }
 
@@ -61,21 +63,18 @@ class ExampleSchemaGenerator : public SchemaGenerator
     DeviceInfo *m_device_info;
     ControlIdentityComparatorSetPtr m_write_access;
 
-public:
-
+  public:
     ExampleSchemaGenerator( ControlContainerPtr root,
                             ProcessingSnapshot *processing_settings,
                             ControlIdentityComparatorSetPtr write_access )
-        : SchemaGenerator(root,m_counts)
-        , m_processing_settings( processing_settings )
-        , m_write_access( write_access )
+        : SchemaGenerator( root, m_counts ), m_processing_settings( processing_settings ), m_write_access( write_access )
     {
     }
 
     ControlContainerPtr generate() override
     {
-        Descriptor::EntityPtr entity = makeEntity("Example Entity", &m_device_info->m_entity );
-        Descriptor::ConfigurationPtr configuration = Descriptor::makeConfiguration("Default");
+        Descriptor::EntityPtr entity = makeEntity( "Example Entity", &m_device_info->m_entity );
+        Descriptor::ConfigurationPtr configuration = Descriptor::makeConfiguration( "Default" );
 
         ControlContainerPtr schema_input = m_root->addItem( "input" );
 
@@ -86,18 +85,19 @@ public:
 
         ControlContainerPtr schema_output = m_root->addItem( "output" );
 
-        for (size_t chan = 0; chan < m_processing_settings->m_output.size(); ++chan )
+        for ( size_t chan = 0; chan < m_processing_settings->m_output.size(); ++chan )
         {
             addOutputChannel( schema_output, configuration, chan, &m_processing_settings->m_output[chan] );
         }
 
         entity->m_configurations.push_back( configuration );
-        entity->collectOwnedDescriptors(m_counts);
+        entity->collectOwnedDescriptors( m_counts );
 
         return m_root;
     }
 
-    ControlContainerPtr addInputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, InputProcessing *v )
+    ControlContainerPtr
+        addInputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, InputProcessing *v )
     {
         string chan_name = formstring( chan + 1 );
         string description = formstring( "Input ", chan_name );
@@ -111,7 +111,8 @@ public:
         return schema_chan;
     }
 
-    ControlContainerPtr addOutputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, OutputProcessing *v )
+    ControlContainerPtr
+        addOutputChannel( ControlContainerPtr root, Descriptor::ConfigurationPtr &config, int chan, OutputProcessing *v )
     {
         string chan_name = formstring( chan + 1 );
         string description = formstring( "Output ", chan_name );
@@ -125,10 +126,9 @@ public:
         return schema_chan;
     }
 
-
     DescriptorPtr makeMuteControlDescriptor( Descriptor::ConfigurationPtr &config, string description, Mute *value )
     {
-        Descriptor::ControlPtr control =  Descriptor::makeControl(
+        Descriptor::ControlPtr control = Descriptor::makeControl(
             AVDECC_AEM_CONTROL_TYPE_MUTE, description, AVDECC_CONTROL_VALUE_LINEAR_UINT8, ControlValue{"mute", value} );
         config->m_control.push_back( control );
         return control;
@@ -136,44 +136,41 @@ public:
 
     DescriptorPtr makeGainControlDescriptor( Descriptor::ConfigurationPtr &config, string description, Gain *value )
     {
-        Descriptor::ControlPtr control =  Descriptor::makeControl(
+        Descriptor::ControlPtr control = Descriptor::makeControl(
             AVDECC_AEM_CONTROL_TYPE_GAIN, description, AVDECC_CONTROL_VALUE_LINEAR_INT32, ControlValue{"gain", value} );
         config->m_control.push_back( control );
         return control;
     }
 };
 
-
-
-
 bool testInteractiveTextConsole( Schema &schema, ControlIdentityComparatorPtr write_access )
 {
     std::istringstream inputs;
 
     inputs.str(
-                "\n"
-                "/input/\\d+/gain\n"
-                "+/input/1/mute\n"
-                "+/input/2/mute\n"
-                "+/input/3/mute\n"
-                ":sleep\n"
-                "?/input/1/mute\n"
-                "?/input/1/gain\n"
-                "/input/\\d+/mute\n"
-                "+/input/\\d+/gain\n"
-                "+\n"
-                "/input/1/gain=-50.0\n"
-                "/input/1/gain\n"
-                "+/input/\\d+/mute\n"
-                ":sleep\n"
-                "+/input/2/mute\n"
-                "/input/2/mute=1\n"
-                "/input/2/gain=-10\n"
-                "/input/1/gain=-40.0\n"
-                ":sleep\n"
-                "-/input/\\d+/gain\n"
-                ":sleep\n"
-                ":exit\n" );
+        "\n"
+        "/input/\\d+/gain\n"
+        "+/input/1/mute\n"
+        "+/input/2/mute\n"
+        "+/input/3/mute\n"
+        ":sleep\n"
+        "?/input/1/mute\n"
+        "?/input/1/gain\n"
+        "/input/\\d+/mute\n"
+        "+/input/\\d+/gain\n"
+        "+\n"
+        "/input/1/gain=-50.0\n"
+        "/input/1/gain\n"
+        "+/input/\\d+/mute\n"
+        ":sleep\n"
+        "+/input/2/mute\n"
+        "/input/2/mute=1\n"
+        "/input/2/gain=-10\n"
+        "/input/1/gain=-40.0\n"
+        ":sleep\n"
+        "-/input/\\d+/gain\n"
+        ":sleep\n"
+        ":exit\n" );
 
     std::ostringstream result;
 

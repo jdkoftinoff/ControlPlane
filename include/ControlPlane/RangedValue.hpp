@@ -54,7 +54,7 @@ class RangedValueBase
     /// \param v The new string value
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueString( string const &v, bool force=false ) = 0;
+    virtual bool setUnencodedValueString( string const &v, bool force = false ) = 0;
 
     ///
     /// \brief setUnencodedValueBool
@@ -64,7 +64,7 @@ class RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueBool( bool v, bool force = false) = 0;
+    virtual bool setUnencodedValueBool( bool v, bool force = false ) = 0;
 
     ///
     /// \brief setUnencodedValueFloat
@@ -74,7 +74,7 @@ class RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueFloat( float v, bool force = false) = 0;
+    virtual bool setUnencodedValueFloat( float v, bool force = false ) = 0;
 
     ///
     /// \brief setUnencodedValueDouble
@@ -84,7 +84,7 @@ class RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueDouble( double v, bool force = false) = 0;
+    virtual bool setUnencodedValueDouble( double v, bool force = false ) = 0;
 
     ///
     /// \brief setUnencodedValueInt64
@@ -94,7 +94,7 @@ class RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueInt64( int64_t v, bool force = false) = 0;
+    virtual bool setUnencodedValueInt64( int64_t v, bool force = false ) = 0;
 
     ///
     /// \brief setUnencodedValueUInt64
@@ -104,7 +104,7 @@ class RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    virtual bool setUnencodedValueUInt64( uint64_t v, bool force = false) = 0;
+    virtual bool setUnencodedValueUInt64( uint64_t v, bool force = false ) = 0;
 
     ///
     /// \brief getUnencodedValueString
@@ -257,27 +257,27 @@ class RangedValueBase
     ///
     virtual const char *getUnitsSuffix() const = 0;
 
-    bool setUnencodedValue( bool v, bool force=false ) { return setUnencodedValueBool( v, false ); }
+    bool setUnencodedValue( bool v, bool force = false ) { return setUnencodedValueBool( v, false ); }
 
-    bool setUnencodedValue( double v, bool force = false) { return setUnencodedValueDouble( v, false); }
+    bool setUnencodedValue( double v, bool force = false ) { return setUnencodedValueDouble( v, false ); }
 
-    bool setUnencodedValue( float v, bool force = false) { return setUnencodedValueFloat( v, false); }
+    bool setUnencodedValue( float v, bool force = false ) { return setUnencodedValueFloat( v, false ); }
 
-    bool setUnencodedValue( int8_t v, bool force = false) { return setUnencodedValueInt64( v, false); }
+    bool setUnencodedValue( int8_t v, bool force = false ) { return setUnencodedValueInt64( v, false ); }
 
-    bool setUnencodedValue( uint8_t v, bool force = false) { return setUnencodedValueUInt64( v, false); }
+    bool setUnencodedValue( uint8_t v, bool force = false ) { return setUnencodedValueUInt64( v, false ); }
 
-    bool setUnencodedValue( int16_t v, bool force = false) { return setUnencodedValueInt64( v, false); }
+    bool setUnencodedValue( int16_t v, bool force = false ) { return setUnencodedValueInt64( v, false ); }
 
-    bool setUnencodedValue( uint16_t v, bool force = false) { return setUnencodedValueUInt64( v, false); }
+    bool setUnencodedValue( uint16_t v, bool force = false ) { return setUnencodedValueUInt64( v, false ); }
 
-    bool setUnencodedValue( int32_t v, bool force = false) { return setUnencodedValueInt64( v, false); }
+    bool setUnencodedValue( int32_t v, bool force = false ) { return setUnencodedValueInt64( v, false ); }
 
-    bool setUnencodedValue( uint32_t v, bool force = false) { return setUnencodedValueUInt64( v, false); }
+    bool setUnencodedValue( uint32_t v, bool force = false ) { return setUnencodedValueUInt64( v, false ); }
 
-    bool setUnencodedValue( int64_t v, bool force = false) { return setUnencodedValueInt64( v, false); }
+    bool setUnencodedValue( int64_t v, bool force = false ) { return setUnencodedValueInt64( v, false ); }
 
-    bool setUnencodedValue( uint64_t v, bool force = false) { return setUnencodedValueUInt64( v, false); }
+    bool setUnencodedValue( uint64_t v, bool force = false ) { return setUnencodedValueUInt64( v, false ); }
 
     void getUnencodedValue( bool *v ) const { *v = getUnencodedValueBool(); }
 
@@ -367,7 +367,7 @@ class RangedValue : public RangedValueBase
     ///
     operator value_type() const { return m_value; }
 
-	bool isReadOnly() const override { return false; }
+    bool isReadOnly() const override { return false; }
 
     ///
     /// \brief setDefault
@@ -388,36 +388,36 @@ class RangedValue : public RangedValueBase
     /// \param v the requested value
     /// \return true if the value changed
     ///
-    bool setValue( value_type v, bool force=false )
+    bool setValue( value_type v, bool force = false )
     {
         bool r = false;
 
-		if (!force)
-		{
-			value_type min = getMinValue();
-			value_type max = getMaxValue();
-			if (v < min)
-			{
-				throw std::range_error("setValue() too small");
-			}
-			if (v > max)
-			{
-				throw std::range_error("setValue() too large");
-			}
-			if (m_value != v)
-			{
-				m_value = v;
-				r = true;
-			}
-		}
-		else
-		{
-			if (m_value != v)
-			{
-				m_value = v;
-				r = true;
-			}
-		}
+        if ( !force )
+        {
+            value_type min = getMinValue();
+            value_type max = getMaxValue();
+            if ( v < min )
+            {
+                throw std::range_error( "setValue() too small" );
+            }
+            if ( v > max )
+            {
+                throw std::range_error( "setValue() too large" );
+            }
+            if ( m_value != v )
+            {
+                m_value = v;
+                r = true;
+            }
+        }
+        else
+        {
+            if ( m_value != v )
+            {
+                m_value = v;
+                r = true;
+            }
+        }
         return r;
     }
 
@@ -470,13 +470,13 @@ class RangedValue : public RangedValueBase
         return setValue( value_type( v8 ), force );
     }
 
-    bool setUnencodedValueFloat( float v, bool force) override { return setValue( v, force ); }
+    bool setUnencodedValueFloat( float v, bool force ) override { return setValue( v, force ); }
 
-    bool setUnencodedValueDouble( double v, bool force) override { return setValue( v, force); }
+    bool setUnencodedValueDouble( double v, bool force ) override { return setValue( v, force ); }
 
-    bool setUnencodedValueInt64( int64_t v, bool force) override { return setValue( v, force); }
+    bool setUnencodedValueInt64( int64_t v, bool force ) override { return setValue( v, force ); }
 
-    bool setUnencodedValueUInt64( uint64_t v, bool force) override { return setValue( v, force); }
+    bool setUnencodedValueUInt64( uint64_t v, bool force ) override { return setValue( v, force ); }
 
     string getUnencodedValueString( bool enable_units ) const override
     {
@@ -1086,7 +1086,7 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     ///
     /// \param v value
     ///
-    RangedValue( value_type v, bool force=false ) { setValue( v, force ); }
+    RangedValue( value_type v, bool force = false ) { setValue( v, force ); }
 
     ///
     /// \brief Value
@@ -1116,7 +1116,7 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     ///
     operator value_type() const { return m_value; }
 
-	bool isReadOnly() const override { return false; }
+    bool isReadOnly() const override { return false; }
 
     ///
     /// \brief setDefault
@@ -1137,7 +1137,7 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     /// \param v the requested value
     /// \return true if the value changed
     ///
-    bool setValue( value_type v, bool force=false )
+    bool setValue( value_type v, bool force = false )
     {
         bool r = false;
         if ( m_value != v )
@@ -1175,30 +1175,30 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
 
     bool setUnencodedValueString( string const &v, bool force ) override { return setValue( v, force ); }
 
-    bool setUnencodedValueBool( bool v, bool force=false ) override { return setValue( v ? "true" : "false" ); }
+    bool setUnencodedValueBool( bool v, bool force = false ) override { return setValue( v ? "true" : "false" ); }
 
-    bool setUnencodedValueFloat( float v, bool force = false) override
+    bool setUnencodedValueFloat( float v, bool force = false ) override
     {
         std::ostringstream buf;
         buf << v;
         return setValue( buf.str() );
     }
 
-    bool setUnencodedValueDouble( double v, bool force = false) override
+    bool setUnencodedValueDouble( double v, bool force = false ) override
     {
         std::ostringstream buf;
         buf << v;
         return setValue( buf.str() );
     }
 
-    bool setUnencodedValueInt64( int64_t v, bool force = false) override
+    bool setUnencodedValueInt64( int64_t v, bool force = false ) override
     {
         std::ostringstream buf;
         buf << v;
         return setValue( buf.str() );
     }
 
-    bool setUnencodedValueUInt64( uint64_t v, bool force = false) override
+    bool setUnencodedValueUInt64( uint64_t v, bool force = false ) override
     {
         std::ostringstream buf;
         buf << v;
@@ -1634,7 +1634,7 @@ class RangedValueEUI64 : public RangedValueBase
     RangedValueEUI64( uint64_t v = 0 ) : m_value( v ) {}
     virtual ~RangedValueEUI64() {}
 
-	bool isReadOnly() const override { return false; }
+    bool isReadOnly() const override { return false; }
 
     ///
     /// \brief getUnitsCode
@@ -1654,7 +1654,7 @@ class RangedValueEUI64 : public RangedValueBase
     /// \return The EncodingType used for the encoded transport of this value
     ///
     EncodingType getEncodingType() const override { return EncodingType::ENCODING_UINT64; }
-    bool setValue( uint64_t v, bool force=false )
+    bool setValue( uint64_t v, bool force = false )
     {
         bool r = false;
         if ( m_value != v )
@@ -1674,7 +1674,7 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v The new string value
     /// \return true if the value changed
     ///
-    bool setUnencodedValueString( string const &sv, bool force=false ) override
+    bool setUnencodedValueString( string const &sv, bool force = false ) override
     {
         std::istringstream is( sv );
         is >> std::hex;
@@ -1691,7 +1691,7 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    bool setUnencodedValueBool( bool v, bool force = false) override { throw std::runtime_error( "invalid type for EUI64" ); }
+    bool setUnencodedValueBool( bool v, bool force = false ) override { throw std::runtime_error( "invalid type for EUI64" ); }
 
     ///
     /// \brief setUnencodedValueFloat
@@ -1701,7 +1701,10 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    bool setUnencodedValueFloat( float v, bool force = false) override { throw std::runtime_error( "invalid type for EUI64" ); }
+    bool setUnencodedValueFloat( float v, bool force = false ) override
+    {
+        throw std::runtime_error( "invalid type for EUI64" );
+    }
 
     ///
     /// \brief setUnencodedValueDouble
@@ -1711,7 +1714,10 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    bool setUnencodedValueDouble( double v, bool force = false) override { throw std::runtime_error( "invalid type for EUI64" ); }
+    bool setUnencodedValueDouble( double v, bool force = false ) override
+    {
+        throw std::runtime_error( "invalid type for EUI64" );
+    }
 
     ///
     /// \brief setUnencodedValueInt64
@@ -1721,7 +1727,10 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    bool setUnencodedValueInt64( int64_t v, bool force = false) override { throw std::runtime_error( "invalid type for EUI64" ); }
+    bool setUnencodedValueInt64( int64_t v, bool force = false ) override
+    {
+        throw std::runtime_error( "invalid type for EUI64" );
+    }
 
     ///
     /// \brief setUnencodedValueUInt64
@@ -1731,7 +1740,7 @@ class RangedValueEUI64 : public RangedValueBase
     /// \param v value to set
     /// \return true if the value changed
     ///
-    bool setUnencodedValueUInt64( uint64_t v, bool force = false) override { return setValue( v ); }
+    bool setUnencodedValueUInt64( uint64_t v, bool force = false ) override { return setValue( v ); }
 
     ///
     /// \brief getUnencodedValueString
@@ -1963,361 +1972,341 @@ class RangedValueEUI64 : public RangedValueBase
     void getUnencodedValue( uint64_t *v ) const { *v = getUnencodedValueUInt64(); }
 };
 
-template <bool DefaultValue=false,bool MinValue=false, bool MaxValue=true>
+template <bool DefaultValue = false, bool MinValue = false, bool MaxValue = true>
 class RangedValueBool : public RangedValueBase
 {
-	bool m_value;
-
-public:
-	RangedValueBool(bool v = DefaultValue) : m_value(v) {}
-	virtual ~RangedValueBool() {}
-
-
-	bool isReadOnly() const override { return false; }
-
-	///
-	/// \brief getUnitsCode
-	///
-	/// \return The UnitsCode for this value
-	///
-	UnitsCode getUnitsCode() const override { return UnitsCode::Unitless; }
-
-	///
-	/// \brief getStorageType
-	/// \return The EncodingType used for the storage of this value
-	///
-	EncodingType getStorageType() const override { return EncodingType::ENCODING_UINT8; }
-
-	///
-	/// \brief getEncodingType
-	/// \return The EncodingType used for the encoded transport of this value
-	///
-	EncodingType getEncodingType() const override { return EncodingType::ENCODING_UINT8; }
-
-	bool setValue(bool v, bool force=false)
-	{
-		bool r = false;
-		if (m_value != v)
-		{
-			if (v == MinValue || v == MaxValue || force==true)
-			{
-				m_value = v;
-				r = true;
-			}
-		}
-		return r;
-	}
-
-	bool setValue(uint8_t v, bool force=false)
-	{
-		return setValue(v == 0xff);
-	}
-
-	///
-	/// \brief setUnencodedValueString
-	///
-	/// If storage type and encoding type are both string, then set
-	/// the string value
-	///
-	/// \param v The new string value
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueString(string const &sv, bool force=false) override
-	{
-		std::istringstream is(sv);
-		is >> std::boolalpha;
-		bool v = 0;
-		is >> v;
-		return setValue(v,force);
-	}
-
-	///
-	/// \brief setUnencodedValueBool
-	///
-	/// Set the unencoded value from a bool
-	///
-	/// \param v value to set
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueBool(bool v,bool force=false) override { return setValue(v,force); }
-
-	///
-	/// \brief setUnencodedValueFloat
-	///
-	/// Set the unencoded value from a float
-	///
-	/// \param v value to set
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueFloat(float v,bool force=false) override 
-	{
-		return setValue(v != 0.0f, force);
-	}
-
-	///
-	/// \brief setUnencodedValueDouble
-	///
-	/// Set the unencoded value from a double
-	///
-	/// \param v value to set
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueDouble(double v, bool force=false) override
-	{
-		return setValue(v != 0.0, force);
-	}
-
-	///
-	/// \brief setUnencodedValueInt64
-	///
-	/// Set the unencoded value from an int64_t
-	///
-	/// \param v value to set
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueInt64(int64_t v, bool force=false) override
-	{
-		return setValue(v != 0,force);
-	}
-
-	///
-	/// \brief setUnencodedValueUInt64
-	///
-	/// Set the unencoded value from an uint64_t
-	///
-	/// \param v value to set
-	/// \return true if the value changed
-	///
-	bool setUnencodedValueUInt64(uint64_t v, bool force=false) override
-	{
-		return setValue(v != 0, force);
-	}
-
-	///
-	/// \brief getUnencodedValueString
-	///
-	/// Get the unencoded value string. If the
-	/// storage type and encoding type is string, then
-	/// it returns the value. If the storage type is not
-	/// string then it returns the textual representation
-	/// optionally with units
-	///
-	/// \return the string representation of the unencoded value
-	///
-	string getUnencodedValueString(bool enable_units = true) const override
-	{
-		std::ostringstream ss;
-		ss << std::boolalpha;
-		ss << m_value;
-		return ss.str();
-	}
-
-	string getUnencodedMinimumString(bool enable_units = true) const override { return MaxValue == true ? "true" : "false"; }
-
-	string getUnencodedMaximumString(bool enable_units = true) const override { return MinValue == true ? "true" : "false"; }
-
-	string getUnencodedDefaultString(bool enable_units = true) const override { return DefaultValue == true ? "true" : "false"; }
-
-	string getUnencodedStepString(bool enable_units = true) const override { return "255"; }
-
-	///
-	/// \brief getUnencodedValueBool
-	/// \return the unencoded value as a bool
-	///
-	bool getUnencodedValueBool() const override { return m_value; }
+    bool m_value;
+
+  public:
+    RangedValueBool( bool v = DefaultValue ) : m_value( v ) {}
+    virtual ~RangedValueBool() {}
+
+    bool isReadOnly() const override { return false; }
+
+    ///
+    /// \brief getUnitsCode
+    ///
+    /// \return The UnitsCode for this value
+    ///
+    UnitsCode getUnitsCode() const override { return UnitsCode::Unitless; }
+
+    ///
+    /// \brief getStorageType
+    /// \return The EncodingType used for the storage of this value
+    ///
+    EncodingType getStorageType() const override { return EncodingType::ENCODING_UINT8; }
+
+    ///
+    /// \brief getEncodingType
+    /// \return The EncodingType used for the encoded transport of this value
+    ///
+    EncodingType getEncodingType() const override { return EncodingType::ENCODING_UINT8; }
+
+    bool setValue( bool v, bool force = false )
+    {
+        bool r = false;
+        if ( m_value != v )
+        {
+            if ( v == MinValue || v == MaxValue || force == true )
+            {
+                m_value = v;
+                r = true;
+            }
+        }
+        return r;
+    }
+
+    bool setValue( uint8_t v, bool force = false ) { return setValue( v == 0xff ); }
+
+    ///
+    /// \brief setUnencodedValueString
+    ///
+    /// If storage type and encoding type are both string, then set
+    /// the string value
+    ///
+    /// \param v The new string value
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueString( string const &sv, bool force = false ) override
+    {
+        std::istringstream is( sv );
+        is >> std::boolalpha;
+        bool v = 0;
+        is >> v;
+        return setValue( v, force );
+    }
+
+    ///
+    /// \brief setUnencodedValueBool
+    ///
+    /// Set the unencoded value from a bool
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueBool( bool v, bool force = false ) override { return setValue( v, force ); }
+
+    ///
+    /// \brief setUnencodedValueFloat
+    ///
+    /// Set the unencoded value from a float
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueFloat( float v, bool force = false ) override { return setValue( v != 0.0f, force ); }
+
+    ///
+    /// \brief setUnencodedValueDouble
+    ///
+    /// Set the unencoded value from a double
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueDouble( double v, bool force = false ) override { return setValue( v != 0.0, force ); }
+
+    ///
+    /// \brief setUnencodedValueInt64
+    ///
+    /// Set the unencoded value from an int64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueInt64( int64_t v, bool force = false ) override { return setValue( v != 0, force ); }
+
+    ///
+    /// \brief setUnencodedValueUInt64
+    ///
+    /// Set the unencoded value from an uint64_t
+    ///
+    /// \param v value to set
+    /// \return true if the value changed
+    ///
+    bool setUnencodedValueUInt64( uint64_t v, bool force = false ) override { return setValue( v != 0, force ); }
+
+    ///
+    /// \brief getUnencodedValueString
+    ///
+    /// Get the unencoded value string. If the
+    /// storage type and encoding type is string, then
+    /// it returns the value. If the storage type is not
+    /// string then it returns the textual representation
+    /// optionally with units
+    ///
+    /// \return the string representation of the unencoded value
+    ///
+    string getUnencodedValueString( bool enable_units = true ) const override
+    {
+        std::ostringstream ss;
+        ss << std::boolalpha;
+        ss << m_value;
+        return ss.str();
+    }
 
-	///
-	/// \brief getUnencodedValueFloat
-	/// \return the unencoded value as a float
-	///
-	float getUnencodedValueFloat() const override { return m_value == true ? 1.0f : 0.0f; }
+    string getUnencodedMinimumString( bool enable_units = true ) const override { return MaxValue == true ? "true" : "false"; }
 
-	///
-	/// \brief getUnencodedValueDouble
-	/// \return the unencoded value as a double
-	///
-	double getUnencodedValueDouble() const override { return m_value == true ? 1.0 : 0.0; }
+    string getUnencodedMaximumString( bool enable_units = true ) const override { return MinValue == true ? "true" : "false"; }
 
-	///
-	/// \brief getUnencodedValueInt64
-	/// \return the unencoded value as an int64_t
-	///
-	int64_t getUnencodedValueInt64() const override { return m_value == true ? 1.0 : 0.0; }
+    string getUnencodedDefaultString( bool enable_units = true ) const override
+    {
+        return DefaultValue == true ? "true" : "false";
+    }
 
-	///
-	/// \brief getUnencodedValueUInt64
-	/// \return the unencoded value as a uint64_t
-	///
-	uint64_t getUnencodedValueUInt64() const override { return m_value == true ? 1.0 : 0.0; }
+    string getUnencodedStepString( bool enable_units = true ) const override { return "255"; }
 
-	float getUnencodedMinimumFloat() const override { return MinValue == true ? 1.0f : 0.0f; }
+    ///
+    /// \brief getUnencodedValueBool
+    /// \return the unencoded value as a bool
+    ///
+    bool getUnencodedValueBool() const override { return m_value; }
 
-	uint64_t getUnencodedMinimumUInt64() const override { return MinValue == true ? 1 : 0; }
+    ///
+    /// \brief getUnencodedValueFloat
+    /// \return the unencoded value as a float
+    ///
+    float getUnencodedValueFloat() const override { return m_value == true ? 1.0f : 0.0f; }
 
-	float getUnencodedMaximumFloat() const override { return MaxValue == true ? 1.0f : 0.0f; }
+    ///
+    /// \brief getUnencodedValueDouble
+    /// \return the unencoded value as a double
+    ///
+    double getUnencodedValueDouble() const override { return m_value == true ? 1.0 : 0.0; }
 
-	uint64_t getUnencodedMaximumUInt64() const override { return MaxValue == true ? 1 : 0; }
+    ///
+    /// \brief getUnencodedValueInt64
+    /// \return the unencoded value as an int64_t
+    ///
+    int64_t getUnencodedValueInt64() const override { return m_value == true ? 1.0 : 0.0; }
 
-	///
-	/// \brief incValue
-	///
-	/// Increment the value by the step value
-	///
-	/// \return true if the value changed
-	///
-	bool incValue() override 
-	{
-		return setValue(true);
-	}
+    ///
+    /// \brief getUnencodedValueUInt64
+    /// \return the unencoded value as a uint64_t
+    ///
+    uint64_t getUnencodedValueUInt64() const override { return m_value == true ? 1.0 : 0.0; }
 
-	///
-	/// \brief decValue
-	///
-	/// Decrement the value by the step value
-	///
-	/// \return true if the value changed
-	///
-	bool decValue() override
-	{
-		return setValue(false);
-	}
+    float getUnencodedMinimumFloat() const override { return MinValue == true ? 1.0f : 0.0f; }
 
-	void getEncodedValueAvdeccString(AvdeccString *storage) const override { storage->set(getUnencodedValueString()); }
+    uint64_t getUnencodedMinimumUInt64() const override { return MinValue == true ? 1 : 0; }
 
-	int8_t getEncodedValueInt8() const override { return m_value == true ? -1 : 0; }
+    float getUnencodedMaximumFloat() const override { return MaxValue == true ? 1.0f : 0.0f; }
 
-	uint8_t getEncodedValueUInt8() const override { return m_value == true ? 0xff : 0; }
+    uint64_t getUnencodedMaximumUInt64() const override { return MaxValue == true ? 1 : 0; }
 
-	int16_t getEncodedValueInt16() const override { return m_value == true ? 0xff : 0; }
+    ///
+    /// \brief incValue
+    ///
+    /// Increment the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    bool incValue() override { return setValue( true ); }
 
-	uint16_t getEncodedValueUInt16() const override { return m_value == true ? 0xff : 0; }
+    ///
+    /// \brief decValue
+    ///
+    /// Decrement the value by the step value
+    ///
+    /// \return true if the value changed
+    ///
+    bool decValue() override { return setValue( false ); }
 
-	int32_t getEncodedValueInt32() const override { return m_value == true ? 0xff : 0; }
+    void getEncodedValueAvdeccString( AvdeccString *storage ) const override { storage->set( getUnencodedValueString() ); }
 
-	uint32_t getEncodedValueUInt32() const override { return m_value == true ? 0xff : 0; }
+    int8_t getEncodedValueInt8() const override { return m_value == true ? -1 : 0; }
 
-	int64_t getEncodedValueInt64() const override { return m_value == true ? 0xff : 0; }
+    uint8_t getEncodedValueUInt8() const override { return m_value == true ? 0xff : 0; }
 
-	uint64_t getEncodedValueUInt64() const override { return m_value == true ? 0xff : 0; }
+    int16_t getEncodedValueInt16() const override { return m_value == true ? 0xff : 0; }
 
-	float getEncodedValueFloat() const override { return m_value == true ? 0xff : 0; }
+    uint16_t getEncodedValueUInt16() const override { return m_value == true ? 0xff : 0; }
 
-	double getEncodedValueDouble() const override { return m_value == true ? 0xff : 0; }
+    int32_t getEncodedValueInt32() const override { return m_value == true ? 0xff : 0; }
 
-	void setFromEncodedValueAvdeccString(const AvdeccString *storage) { setUnencodedValueString(storage->get()); }
+    uint32_t getEncodedValueUInt32() const override { return m_value == true ? 0xff : 0; }
 
-	bool setFromEncodedValueInt8(int8_t v) override { return setValue(v == 0 ? false : true); }
+    int64_t getEncodedValueInt64() const override { return m_value == true ? 0xff : 0; }
 
-	bool setFromEncodedValueUInt8(uint8_t v) override { return setValue(v == 0 ? false : true); }
+    uint64_t getEncodedValueUInt64() const override { return m_value == true ? 0xff : 0; }
 
-	bool setFromEncodedValueInt16(int16_t v) override { return setValue(v == 0 ? false : true); }
+    float getEncodedValueFloat() const override { return m_value == true ? 0xff : 0; }
 
-	bool setFromEncodedValueUInt16(uint16_t v) override { return setValue(v == 0 ? false : true); }
+    double getEncodedValueDouble() const override { return m_value == true ? 0xff : 0; }
 
-	bool setFromEncodedValueInt32(int32_t v) override { return setValue(v == 0 ? false : true); }
+    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) { setUnencodedValueString( storage->get() ); }
 
-	bool setFromEncodedValueUInt32(uint32_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueInt8( int8_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueInt64(int64_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueUInt8( uint8_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueUInt64(uint64_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueInt16( int16_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueFloat(float v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueUInt16( uint16_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueDouble(double v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueInt32( int32_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampInt8(int8_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueUInt32( uint32_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampUInt8(uint8_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueInt64( int64_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampInt16(int16_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueUInt64( uint64_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampUInt16(uint16_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueFloat( float v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampInt32(int32_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueDouble( double v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampUInt32(uint32_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueWithClampInt8( int8_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampInt64(int64_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueWithClampUInt8( uint8_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampUInt64(uint64_t v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueWithClampInt16( int16_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampFloat(float v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueWithClampUInt16( uint16_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	bool setFromEncodedValueWithClampDouble(double v) override { return setValue(v == 0 ? false : true); }
+    bool setFromEncodedValueWithClampInt32( int32_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getEncodedMinValue
-	/// \return The encoded minimum value
-	///
-	int64_t getEncodedMinValue() const override { return MinValue==true ? 0xff : 0; }
+    bool setFromEncodedValueWithClampUInt32( uint32_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getEncodedMaxValue
-	/// \return The encoded maximum value
-	///
-	int64_t getEncodedMaxValue() const override { return MaxValue == true ? 0xff : 0; }
+    bool setFromEncodedValueWithClampInt64( int64_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getEncodedStepValue
-	/// \return The encoded step value
-	///
-	int64_t getEncodedStepValue() const override { return 0xff; }
+    bool setFromEncodedValueWithClampUInt64( uint64_t v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getEncodedDefaultValue
-	/// \return the encoded default value
-	///
-	int64_t getEncodedDefaultValue() const override { return DefaultValue == true ? 0xff : 0; }
+    bool setFromEncodedValueWithClampFloat( float v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getEncodingMultiplierPower
-	/// \return the power of 10 used for encoding
-	///
-	int8_t getEncodingMultiplierPower() const override { return 0; }
+    bool setFromEncodedValueWithClampDouble( double v ) override { return setValue( v == 0 ? false : true ); }
 
-	///
-	/// \brief getUnitsSuffix
-	///
-	/// Get the units suffix
-	///
-	/// \return C string containing UTF8 suffix for the SI Units used
-	///
-	const char *getUnitsSuffix() const override { return ""; }
+    ///
+    /// \brief getEncodedMinValue
+    /// \return The encoded minimum value
+    ///
+    int64_t getEncodedMinValue() const override { return MinValue == true ? 0xff : 0; }
 
-	bool setUnencodedValue(bool v) { return setUnencodedValueBool(v); }
+    ///
+    /// \brief getEncodedMaxValue
+    /// \return The encoded maximum value
+    ///
+    int64_t getEncodedMaxValue() const override { return MaxValue == true ? 0xff : 0; }
 
-	bool setUnencodedValue(double v) { return setUnencodedValueDouble(v); }
+    ///
+    /// \brief getEncodedStepValue
+    /// \return The encoded step value
+    ///
+    int64_t getEncodedStepValue() const override { return 0xff; }
 
-	bool setUnencodedValue(float v) { return setUnencodedValueFloat(v); }
+    ///
+    /// \brief getEncodedDefaultValue
+    /// \return the encoded default value
+    ///
+    int64_t getEncodedDefaultValue() const override { return DefaultValue == true ? 0xff : 0; }
 
-	bool setUnencodedValue(int8_t v) { return setUnencodedValueInt64(v); }
+    ///
+    /// \brief getEncodingMultiplierPower
+    /// \return the power of 10 used for encoding
+    ///
+    int8_t getEncodingMultiplierPower() const override { return 0; }
 
-	bool setUnencodedValue(uint8_t v) { return setUnencodedValueUInt64(v); }
+    ///
+    /// \brief getUnitsSuffix
+    ///
+    /// Get the units suffix
+    ///
+    /// \return C string containing UTF8 suffix for the SI Units used
+    ///
+    const char *getUnitsSuffix() const override { return ""; }
 
-	bool setUnencodedValue(int16_t v) { return setUnencodedValueInt64(v); }
+    bool setUnencodedValue( bool v ) { return setUnencodedValueBool( v ); }
 
-	bool setUnencodedValue(uint16_t v) { return setUnencodedValueUInt64(v); }
+    bool setUnencodedValue( double v ) { return setUnencodedValueDouble( v ); }
 
-	bool setUnencodedValue(int32_t v) { return setUnencodedValueInt64(v); }
+    bool setUnencodedValue( float v ) { return setUnencodedValueFloat( v ); }
 
-	bool setUnencodedValue(uint32_t v) { return setUnencodedValueUInt64(v); }
+    bool setUnencodedValue( int8_t v ) { return setUnencodedValueInt64( v ); }
 
-	bool setUnencodedValue(int64_t v) { return setUnencodedValueInt64(v); }
+    bool setUnencodedValue( uint8_t v ) { return setUnencodedValueUInt64( v ); }
 
-	bool setUnencodedValue(uint64_t v) { return setUnencodedValueUInt64(v); }
+    bool setUnencodedValue( int16_t v ) { return setUnencodedValueInt64( v ); }
 
-	void getUnencodedValue(bool *v) const { *v = getUnencodedValueBool(); }
+    bool setUnencodedValue( uint16_t v ) { return setUnencodedValueUInt64( v ); }
 
-	void getUnencodedValue(double *v) const { *v = getUnencodedValueDouble(); }
+    bool setUnencodedValue( int32_t v ) { return setUnencodedValueInt64( v ); }
 
-	void getUnencodedValue(float *v) const { *v = getUnencodedValueFloat(); }
+    bool setUnencodedValue( uint32_t v ) { return setUnencodedValueUInt64( v ); }
 
-	void getUnencodedValue(int64_t *v) const { *v = getUnencodedValueInt64(); }
+    bool setUnencodedValue( int64_t v ) { return setUnencodedValueInt64( v ); }
 
-	void getUnencodedValue(string *v) const { *v = getUnencodedValueString(false); }
+    bool setUnencodedValue( uint64_t v ) { return setUnencodedValueUInt64( v ); }
 
-	void getUnencodedValue(uint64_t *v) const { *v = getUnencodedValueUInt64(); }
+    void getUnencodedValue( bool *v ) const { *v = getUnencodedValueBool(); }
+
+    void getUnencodedValue( double *v ) const { *v = getUnencodedValueDouble(); }
+
+    void getUnencodedValue( float *v ) const { *v = getUnencodedValueFloat(); }
+
+    void getUnencodedValue( int64_t *v ) const { *v = getUnencodedValueInt64(); }
+
+    void getUnencodedValue( string *v ) const { *v = getUnencodedValueString( false ); }
+
+    void getUnencodedValue( uint64_t *v ) const { *v = getUnencodedValueUInt64(); }
 };
-
 }
