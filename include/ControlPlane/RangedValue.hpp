@@ -472,11 +472,11 @@ class RangedValue : public RangedValueBase
 
     bool setUnencodedValueFloat( float v, bool force ) override { return setValue( v, force ); }
 
-    bool setUnencodedValueDouble( double v, bool force ) override { return setValue( v, force ); }
+    bool setUnencodedValueDouble( double v, bool force ) override { return setValue( (value_type)v, force ); }
 
-    bool setUnencodedValueInt64( int64_t v, bool force ) override { return setValue( v, force ); }
+    bool setUnencodedValueInt64( int64_t v, bool force ) override { return setValue( (value_type)v, force ); }
 
-    bool setUnencodedValueUInt64( uint64_t v, bool force ) override { return setValue( v, force ); }
+    bool setUnencodedValueUInt64( uint64_t v, bool force ) override { return setValue( (value_type)v, force ); }
 
     string getUnencodedValueString( bool enable_units ) const override
     {
@@ -555,21 +555,21 @@ class RangedValue : public RangedValueBase
 
     bool getUnencodedValueBool() const override { return m_value != value_type(); }
 
-    float getUnencodedValueFloat() const override { return m_value; }
+    float getUnencodedValueFloat() const override { return (float)m_value; }
 
-    double getUnencodedValueDouble() const override { return m_value; }
+    double getUnencodedValueDouble() const override { return (double)m_value; }
 
-    int64_t getUnencodedValueInt64() const override { return m_value; }
+    int64_t getUnencodedValueInt64() const override { return (int64_t)m_value; }
 
-    uint64_t getUnencodedValueUInt64() const override { return m_value; }
+    uint64_t getUnencodedValueUInt64() const override { return (uint64_t)m_value; }
 
-    float getUnencodedMinimumFloat() const override { return getMinValue(); }
+    float getUnencodedMinimumFloat() const override { return (float)getMinValue(); }
 
-    uint64_t getUnencodedMinimumUInt64() const override { return getMinValue(); }
+    uint64_t getUnencodedMinimumUInt64() const override { return (uint64_t)getMinValue(); }
 
-    float getUnencodedMaximumFloat() const override { return getMaxValue(); }
+    float getUnencodedMaximumFloat() const override { return (float)getMaxValue(); }
 
-    uint64_t getUnencodedMaximumUInt64() const override { return getMaxValue(); }
+    uint64_t getUnencodedMaximumUInt64() const override { return (uint64_t)getMaxValue(); }
 
     ///
     /// \brief incValue
@@ -2138,13 +2138,13 @@ class RangedValueBool : public RangedValueBase
     /// \brief getUnencodedValueInt64
     /// \return the unencoded value as an int64_t
     ///
-    int64_t getUnencodedValueInt64() const override { return m_value == true ? 1.0 : 0.0; }
+    int64_t getUnencodedValueInt64() const override { return m_value == true ? 1 : 0; }
 
     ///
     /// \brief getUnencodedValueUInt64
     /// \return the unencoded value as a uint64_t
     ///
-    uint64_t getUnencodedValueUInt64() const override { return m_value == true ? 1.0 : 0.0; }
+    uint64_t getUnencodedValueUInt64() const override { return m_value == true ? 1 : 0; }
 
     float getUnencodedMinimumFloat() const override { return MinValue == true ? 1.0f : 0.0f; }
 
@@ -2190,9 +2190,9 @@ class RangedValueBool : public RangedValueBase
 
     uint64_t getEncodedValueUInt64() const override { return m_value == true ? 0xff : 0; }
 
-    float getEncodedValueFloat() const override { return m_value == true ? 0xff : 0; }
+    float getEncodedValueFloat() const override { return m_value == true ? 255.0f : 0.0f; }
 
-    double getEncodedValueDouble() const override { return m_value == true ? 0xff : 0; }
+    double getEncodedValueDouble() const override { return m_value == true ? 255.0 : 0; }
 
     void setFromEncodedValueAvdeccString( const AvdeccString *storage ) { setUnencodedValueString( storage->get() ); }
 
