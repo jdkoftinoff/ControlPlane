@@ -6,9 +6,9 @@
 namespace ControlPlane
 {
 
-using Mute = RangedValue<UnitsCode::Unitless, 0, 1, 0, 1, 0, uint8_t, bool>;
+using Mute = RangedValueBool<false, false, true>;
 
-using Polarity = RangedValue<UnitsCode::Unitless, 0, 1, 0, 1, 0, uint8_t, bool>;
+using Polarity = RangedValueBool<false, false, true>;
 
 /** Gain
  *

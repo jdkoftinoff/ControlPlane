@@ -32,6 +32,7 @@ T1 integer_pow10( T2 exponent )
     return r;
 }
 
+
 ///
 /// \brief getEncodingMultiplier
 ///

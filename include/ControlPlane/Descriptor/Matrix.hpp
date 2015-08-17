@@ -45,11 +45,11 @@ class Matrix : public DescriptorBase
 
     uint16_t getAvdeccControlValueType() const override { return m_avdecc_control_value_type; }
 
-    virtual uint16_t getNumValues() const override { return m_control_point_values.back().back().size(); }
+    virtual uint16_t getNumValues() const override { return (uint16_t)m_control_point_values.back().back().size(); }
 
-    virtual uint16_t getWidth() const override { return m_control_point_values.back().size(); }
+    virtual uint16_t getWidth() const override { return (uint16_t)m_control_point_values.back().size(); }
 
-    virtual uint16_t getHeight() const override { return m_control_point_values.size(); }
+    virtual uint16_t getHeight() const override { return (uint16_t)m_control_point_values.size(); }
 
     ControlValue &getValue( size_t item_num, size_t w, size_t h ) override { return m_control_point_values[h][w][item_num]; }
 

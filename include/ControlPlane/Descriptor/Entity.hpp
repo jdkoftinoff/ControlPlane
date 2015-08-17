@@ -27,7 +27,7 @@ class Entity : public DescriptorBase
             RangedValueEUI64 *entity_model_id );
     virtual ~Entity() {}
 
-    uint16_t getNumNames() const override { return m_names.size(); }
+    uint16_t getNumNames() const override { return (uint16_t)m_names.size(); }
 
     DescriptorString const *getName( size_t name_index = 0 ) const override;
 
@@ -45,7 +45,7 @@ class Entity : public DescriptorBase
 
     uint16_t getAvdeccControlValueType() const override { return AVDECC_CONTROL_VALUE_UTF8; }
 
-    uint16_t getNumValues() const override { return m_items.size(); }
+    uint16_t getNumValues() const override { return (uint16_t)m_items.size(); }
 
     uint16_t getWidth() const override { return 1; }
 

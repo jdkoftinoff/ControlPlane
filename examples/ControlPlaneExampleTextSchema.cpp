@@ -79,14 +79,14 @@ public:
 
         ControlContainerPtr schema_input = m_root->addItem( "input" );
 
-        for ( int chan = 0; chan < m_processing_settings->m_input.size(); ++chan )
+        for ( size_t chan = 0; chan < m_processing_settings->m_input.size(); ++chan )
         {
             addInputChannel( schema_input, configuration, chan, &m_processing_settings->m_input[chan] );
         }
 
         ControlContainerPtr schema_output = m_root->addItem( "output" );
 
-        for ( int chan = 0; chan < m_processing_settings->m_output.size(); ++chan )
+        for (size_t chan = 0; chan < m_processing_settings->m_output.size(); ++chan )
         {
             addOutputChannel( schema_output, configuration, chan, &m_processing_settings->m_output[chan] );
         }

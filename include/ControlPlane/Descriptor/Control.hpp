@@ -67,7 +67,7 @@ class Control : public DescriptorBase
 
     uint16_t getAvdeccControlValueType() const override { return m_avdecc_control_value_type; }
 
-    virtual uint16_t getNumValues() const override { return m_control_point_values.size(); }
+    virtual uint16_t getNumValues() const override { return (uint16_t)m_control_point_values.size(); }
 
     virtual uint16_t getWidth() const override { return 1; }
 

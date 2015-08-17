@@ -55,22 +55,4 @@ bool ChangeNotificationRange::containsDescriptor( const ControlIdentity &d ) con
     return r;
 }
 
-std::ostream &operator<<( std::ostream &o, ChangeNotificationRange const &v )
-{
-    for ( size_t i = 0; i < v.m_descriptors.size(); ++i )
-    {
-        if ( v.m_descriptors[i] )
-        {
-            o << "Descriptor Type " << i << std::endl;
-        }
-    }
-
-    o << "min_descriptor_index: " << v.m_min_descriptor_index << std::endl;
-    o << "max_descriptor_index: " << v.m_max_descriptor_index << std::endl;
-
-    o << "min_update_period_in_milliseconds: " << v.m_min_update_period_in_milliseconds << std::endl;
-    o << "max_update_period_in_milliseconds: " << v.m_max_update_period_in_milliseconds << std::endl;
-
-    return o;
-}
 }
