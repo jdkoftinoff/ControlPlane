@@ -8,7 +8,10 @@ namespace Text
 
 using namespace ControlPlane::Util;
 
-void getAddressForIdentity( TextAddress &address, const ControlIdentity &identity, const SchemaAddress &schema_address )
+bool getTextAddressForIdentity( TextAddress &address,
+                                const ControlIdentity &identity,
+                                const SchemaAddress &schema_address,
+                                Schema &schema )
 {
     string r = "/";
     size_t count = schema_address.size();
@@ -22,6 +25,7 @@ void getAddressForIdentity( TextAddress &address, const ControlIdentity &identit
         }
     }
     address = TextAddress{r};
+    return true;
 }
 
 bool TextProtocolSession::handleLine( Milliseconds current_time_in_milliseconds, const string &line )

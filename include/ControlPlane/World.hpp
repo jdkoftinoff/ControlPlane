@@ -17,6 +17,7 @@
 #include <vector>
 #include <typeinfo>
 #include <array>
+#include <tuple>
 #include <valarray>
 #include <algorithm>
 #include <functional>

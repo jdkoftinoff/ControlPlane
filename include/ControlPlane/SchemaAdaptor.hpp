@@ -52,6 +52,11 @@ class SchemaAdaptorBase
 template <typename AddressT>
 class SchemaAdaptor : public SchemaAdaptorBase
 {
+  private:
+    std::function<bool(
+        AddressT &address, ControlIdentity const &identity, SchemaAddress const &schema_address, Schema &schema )>
+        m_address_translate_function;
+
   public:
     class SchemaAdaptorErrorReadOnly : public SchemaError
     {
@@ -78,7 +83,15 @@ class SchemaAdaptor : public SchemaAdaptorBase
         }
     };
 
-    SchemaAdaptor( Schema &target ) : SchemaAdaptorBase( target ) { collectDescriptors(); }
+    SchemaAdaptor(
+        Schema &target,
+        std::function<bool(
+            AddressT &address, ControlIdentity const &identity, SchemaAddress const &schema_address, Schema &schema )>
+            address_translate_function )
+        : SchemaAdaptorBase( target ), m_address_translate_function( address_translate_function )
+    {
+        collectDescriptors();
+    }
 
     std::map<AddressT, ControlIdentity> const &getAddressMap() const { return m_address_map; }
 
@@ -286,14 +299,19 @@ class SchemaAdaptor : public SchemaAdaptorBase
     void collectItem( ControlIdentity const &identity, SchemaAddress const &schema_address ) override
     {
         AddressT address;
-        getAddressForIdentity( address, identity, schema_address );
-        m_address_map[address] = identity;
-        m_identity_map[identity] = address;
+        if ( m_address_translate_function( address, identity, schema_address, getTarget() ) )
+        {
+            m_address_map[address] = identity;
+            m_identity_map[identity] = address;
+        }
     }
 
     std::map<AddressT, ControlIdentity> m_address_map;
     std::map<ControlIdentity, AddressT> m_identity_map;
 };
 
-void getAddressForIdentity( ControlIdentity &address, ControlIdentity const &identity, SchemaAddress const &schema_address );
+bool getAddressForIdentity( ControlIdentity &address,
+                            ControlIdentity const &identity,
+                            SchemaAddress const &schema_address,
+                            Schema &schema );
 }

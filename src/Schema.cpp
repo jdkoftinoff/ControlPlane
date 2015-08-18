@@ -13,6 +13,7 @@ void Schema::collectDescriptors()
                                 ControlIdentity identity = descriptor->getControlIdentity();
                                 m_descriptor_avdecc_map[identity] = descriptor;
                                 m_address_map[address] = identity;
+                                m_identity_map[identity] = address;
                             } );
 }
 

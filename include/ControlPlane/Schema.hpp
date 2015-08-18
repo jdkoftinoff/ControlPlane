@@ -180,11 +180,13 @@ class Schema
     ControlContainerPtr const getTop() const { return m_top_level; }
 
     std::map<SchemaAddress, ControlIdentity> const &getAddressMap() const { return m_address_map; }
+    std::map<ControlIdentity, SchemaAddress> const &getIdentityMap() const { return m_identity_map; }
 
   protected:
     ControlContainerPtr m_top_level;
     DescriptorAvdeccMap m_descriptor_avdecc_map;
     std::map<SchemaAddress, ControlIdentity> m_address_map;
+    std::map<ControlIdentity, SchemaAddress> m_identity_map;
     ChangeNotifierManager m_change_manager;
     mutable std::recursive_mutex m_access_mutex;
 };

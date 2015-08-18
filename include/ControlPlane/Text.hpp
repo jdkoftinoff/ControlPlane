@@ -41,7 +41,10 @@ struct TextAddress
 
 using SchemaTextAdaptor = SchemaAdaptor<TextAddress>;
 
-void getAddressForIdentity( TextAddress &address, ControlIdentity const &identity, SchemaAddress const &schema_address );
+bool getTextAddressForIdentity( TextAddress &address,
+                                ControlIdentity const &identity,
+                                SchemaAddress const &schema_address,
+                                Schema &schema );
 
 struct TextProtocolSession
 {

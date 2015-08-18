@@ -109,8 +109,12 @@ void SchemaAdaptorBase::collectDescriptors()
                          } );
 }
 
-void getAddressForIdentity( ControlIdentity &address, const ControlIdentity &identity, const SchemaAddress &schema_address )
+bool getAddressForIdentity( ControlIdentity &address,
+                            const ControlIdentity &identity,
+                            const SchemaAddress &schema_address,
+                            Schema &schema )
 {
     address = identity;
+    return true;
 }
 }

@@ -52,7 +52,7 @@ inline void interactiveTextConsole( std::ostream &output,
 
     try
     {
-        SchemaTextAdaptor text_schema( schema );
+        SchemaTextAdaptor text_schema( schema, getTextAddressForIdentity );
         TextIOWithStream text_io( input, output );
         TextProtocolSession session( text_io, text_schema, write_access, echo );
 
