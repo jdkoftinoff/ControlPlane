@@ -470,7 +470,7 @@ class RangedValue : public RangedValueBase
         return setValue( value_type( v8 ), force );
     }
 
-    bool setUnencodedValueFloat( float v, bool force ) override { return setValue( v, force ); }
+    bool setUnencodedValueFloat( float v, bool force ) override { return setValue( (value_type)v, force ); }
 
     bool setUnencodedValueDouble( double v, bool force ) override { return setValue( (value_type)v, force ); }
 
@@ -703,7 +703,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = integer_pow10<value_type>( -multiplier_power );
+            r = integer_pow10<value_type>(r, -multiplier_power );
         }
         return r;
     }
@@ -723,7 +723,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = integer_pow10<value_type>( multiplier_power );
+            r = integer_pow10<value_type>(r, multiplier_power );
         }
         return r;
     }
@@ -743,7 +743,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = integer_pow10<value_type>( multiplier_power );
+            r = integer_pow10<value_type>(r, multiplier_power );
         }
         return r;
     }
@@ -763,7 +763,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = integer_pow10<value_type>( -multiplier_power );
+            r = integer_pow10<value_type>(r, -multiplier_power );
         }
         return r;
     }
@@ -2325,4 +2325,16 @@ class RangedValueBool : public RangedValueBase
 
     void getUnencodedValue( uint64_t *v ) const { *v = getUnencodedValueUInt64(); }
 };
+
+template <UnitsCode UnitsValue,
+	int64_t MinValue,
+	int64_t MaxValue,
+	int64_t DefaultValue,
+	int64_t StepValue,
+	int MultiplierPowerValue,
+	typename EncodedT>
+class RangedValue<UnitsValue,MinValue,MaxValue,DefaultValue,StepValue,MultiplierPowerValue,EncodedT,bool>
+{
+};
+
 }

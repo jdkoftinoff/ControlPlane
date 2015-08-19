@@ -22,7 +22,7 @@ class Entity : public DescriptorBase
             RangedValueEUI64 *entity_id,
             RangedValueEUI64 *entity_model_id );
 
-    uint16_t getNumValues() const override { return m_items.size(); }
+    uint16_t getNumValues() const override { return (uint16_t)m_items.size(); }
 
     uint16_t getWidth() const override { return 1; }
 

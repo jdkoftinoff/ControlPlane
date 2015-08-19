@@ -21,15 +21,69 @@ extern float powers_of_ten[25];
 /// Works with integer types and floating point types.
 ///
 template <typename T1, typename T2>
-T1 integer_pow10( T2 exponent )
+T1 integer_pow10( T1 &r, T2 exponent )
 {
-    T1 r = 0;
+    r = 0;
     int e = int( exponent ) + 12;
     if ( e >= 0 && e <= 25 )
     {
-        r = powers_of_ten[e];
+        r = (T1)powers_of_ten[e];
     }
     return r;
+}
+
+template <typename T2>
+inline bool integer_pow10(bool &r, T2 exponent)
+{
+	r = false;
+}
+
+template <typename T2>
+inline unsigned int integer_pow10(unsigned int &r, T2 exponent)
+{
+	r = 0;
+	int e = int(exponent) + 12;
+	if (e >= 0 && e <= 25)
+	{
+		r = (unsigned int)powers_of_ten[e];
+	}
+	return r;
+}
+
+template <typename T2>
+inline int integer_pow10(int &r, T2 exponent)
+{
+	r = 0;
+	int e = int(exponent) + 12;
+	if (e >= 0 && e <= 25)
+	{
+		r = (int)powers_of_ten[e];
+	}
+	return r;
+}
+
+template <typename T2>
+inline short integer_pow10(short &r, T2 exponent)
+{
+	r = 0;
+	int e = int(exponent) + 12;
+	if (e >= 0 && e <= 25)
+	{
+		r = (short)powers_of_ten[e];
+	}
+	return r;
+}
+
+template <typename T2>
+inline unsigned short integer_pow10(unsigned short &r, T2 exponent)
+{
+	r = 0;
+	int e = int(exponent) + 12;
+	if (e >= 0 && e <= 25)
+	{
+		r = (unsigned short)powers_of_ten[e];
+	}
+	return r;
 }
 
 ///
@@ -48,7 +102,7 @@ T getEncodingMultiplier( int8_t multiplier_power )
     T r = 1;
     if ( multiplier_power < 0 )
     {
-        r = integer_pow10<T>( -multiplier_power );
+        r = integer_pow10<T>( r, -multiplier_power );
     }
     return r;
 }
@@ -69,7 +123,7 @@ T getEncodingDivider( int8_t multiplier_power )
     T r = 1;
     if ( multiplier_power > 0 )
     {
-        r = integer_pow10<T>( multiplier_power );
+        r = integer_pow10<T>(r, multiplier_power );
     }
     return r;
 }
@@ -90,7 +144,7 @@ T getDecodingMultiplier( int8_t multiplier_power )
     T r = 1;
     if ( multiplier_power > 0 )
     {
-        r = integer_pow10<T>( multiplier_power );
+        r = integer_pow10<T>(r, multiplier_power );
     }
     return r;
 }
@@ -111,7 +165,7 @@ T getDecodingDivider( int8_t multiplier_power )
     T r = 1;
     if ( multiplier_power < 0 )
     {
-        r = integer_pow10<T>( -multiplier_power );
+        r = integer_pow10<T>(r, -multiplier_power );
     }
     return r;
 }
