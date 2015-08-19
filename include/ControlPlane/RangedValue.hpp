@@ -703,7 +703,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = integer_pow10<value_type>(r, -multiplier_power );
+            r = integer_pow10<value_type>( r, -multiplier_power );
         }
         return r;
     }
@@ -723,7 +723,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = integer_pow10<value_type>(r, multiplier_power );
+            r = integer_pow10<value_type>( r, multiplier_power );
         }
         return r;
     }
@@ -743,7 +743,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power > 0 )
         {
-            r = integer_pow10<value_type>(r, multiplier_power );
+            r = integer_pow10<value_type>( r, multiplier_power );
         }
         return r;
     }
@@ -763,7 +763,7 @@ class RangedValue : public RangedValueBase
         value_type r = 1;
         if ( multiplier_power < 0 )
         {
-            r = integer_pow10<value_type>(r, -multiplier_power );
+            r = integer_pow10<value_type>( r, -multiplier_power );
         }
         return r;
     }
@@ -2327,14 +2327,13 @@ class RangedValueBool : public RangedValueBase
 };
 
 template <UnitsCode UnitsValue,
-	int64_t MinValue,
-	int64_t MaxValue,
-	int64_t DefaultValue,
-	int64_t StepValue,
-	int MultiplierPowerValue,
-	typename EncodedT>
-class RangedValue<UnitsValue,MinValue,MaxValue,DefaultValue,StepValue,MultiplierPowerValue,EncodedT,bool>
+          int64_t MinValue,
+          int64_t MaxValue,
+          int64_t DefaultValue,
+          int64_t StepValue,
+          int MultiplierPowerValue,
+          typename EncodedT>
+class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, MultiplierPowerValue, EncodedT, bool>
 {
 };
-
 }
