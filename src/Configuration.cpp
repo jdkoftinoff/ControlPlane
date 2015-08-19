@@ -28,9 +28,9 @@ void putDescriptorCounts( FixedBuffer &pdu, const std::vector<std::shared_ptr<T>
 
 void Configuration::storeToPDU( FixedBuffer &pdu ) const
 {
-    pdu.putDoublet( m_avdecc_descriptor_type );
-    pdu.putDoublet( m_avdecc_descriptor_index );
-    pdu.putAvdeccString( m_object_name.getValue() );
+    pdu.putDoublet( getAvdeccDescriptorType() );
+    pdu.putDoublet( getAvdeccDescriptorIndex() );
+    pdu.putAvdeccString( getName( 0 )->getValue() );
     pdu.putDoublet( 0xffff );
 
     size_t descriptor_counts_count = getChildDescriptors().size();

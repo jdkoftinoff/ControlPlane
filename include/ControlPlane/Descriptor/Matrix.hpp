@@ -10,24 +10,15 @@ namespace Descriptor
 
 class Matrix : public DescriptorBase
 {
-  protected:
-    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
-    {
-        m_avdecc_descriptor_index = new_descriptor_index;
-    }
-
   public:
-    Matrix( DescriptorCounts &counts, uint64_t avdecc_control_type, string description, uint16_t avdecc_control_value_type );
+    static const uint16_t descriptor_type = AVDECC_DESCRIPTOR_MATRIX;
 
-    virtual ~Matrix() {}
-
-    uint16_t getNumNames() const override { return 1; }
-
-    DescriptorString const *getName( size_t name_index = 0 ) const override;
-
-    DescriptorString *getName( size_t name_index = 0 ) override;
-
-    bool setName( string val, size_t name_index = 0 ) override;
+    Matrix( uint64_t avdecc_control_type, string description, uint16_t avdecc_control_value_type )
+        : DescriptorBase( description, descriptor_type )
+        , m_avdecc_control_type( avdecc_control_type )
+        , m_avdecc_control_value_type( avdecc_control_value_type )
+    {
+    }
 
     void addRow() { m_control_point_values.emplace_back(); }
 
@@ -36,12 +27,6 @@ class Matrix : public DescriptorBase
     void addValue( ControlValue v ) { m_control_point_values.back().back().push_back( v ); }
 
     uint64_t getAvdeccControlType() const override { return m_avdecc_control_type; }
-
-    uint16_t getAvdeccDescriptorType() const override { return m_avdecc_descriptor_type; }
-
-    uint16_t getAvdeccDescriptorIndex() const override { return m_avdecc_descriptor_index; }
-
-    string getDescription() const override { return m_description; }
 
     uint16_t getAvdeccControlValueType() const override { return m_avdecc_control_value_type; }
 
@@ -65,11 +50,7 @@ class Matrix : public DescriptorBase
     void collectOwnedDescriptors( DescriptorCounts &counts ) override;
 
     uint64_t m_avdecc_control_type;
-    uint16_t m_avdecc_descriptor_type;
-    uint16_t m_avdecc_descriptor_index;
-    string m_description;
     uint16_t m_avdecc_control_value_type;
-    DescriptorString m_object_name;
     vector<vector<vector<ControlValue> > > m_control_point_values;
     vector<MatrixSignalPtr> m_matrix_signals;
 };

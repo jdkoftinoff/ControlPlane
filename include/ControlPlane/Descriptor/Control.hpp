@@ -10,11 +10,6 @@ namespace Descriptor
 
 class Control : public DescriptorBase
 {
-  protected:
-    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
-    {
-        m_avdecc_descriptor_index = new_descriptor_index;
-    }
 
   private:
     template <typename T>
@@ -41,9 +36,8 @@ class Control : public DescriptorBase
              uint16_t avdecc_control_value_type,
              ControlValue first,
              ArgT &&... args )
-        : m_avdecc_control_type( avdecc_control_type )
-        , m_avdecc_descriptor_type( AVDECC_DESCRIPTOR_CONTROL )
-        , m_description( description )
+        : DescriptorBase( description, descriptor_type )
+        , m_avdecc_control_type( avdecc_control_type )
         , m_avdecc_control_value_type( avdecc_control_value_type )
     {
         push_back_multi( m_control_point_values, first, args... );
@@ -51,21 +45,7 @@ class Control : public DescriptorBase
 
     virtual ~Control() {}
 
-    uint16_t getNumNames() const override { return 1; }
-
-    DescriptorString const *getName( size_t name_index = 0 ) const override;
-
-    DescriptorString *getName( size_t name_index = 0 ) override;
-
-    bool setName( string val, size_t name_index = 0 ) override;
-
     uint64_t getAvdeccControlType() const override { return m_avdecc_control_type; }
-
-    uint16_t getAvdeccDescriptorType() const override { return m_avdecc_descriptor_type; }
-
-    uint16_t getAvdeccDescriptorIndex() const override { return m_avdecc_descriptor_index; }
-
-    string getDescription() const override { return m_description; }
 
     uint16_t getAvdeccControlValueType() const override { return m_avdecc_control_value_type; }
 
@@ -87,11 +67,7 @@ class Control : public DescriptorBase
     void storeToPDU( FixedBuffer &pdu ) const override { /* TODO */}
 
     uint64_t m_avdecc_control_type;
-    uint16_t m_avdecc_descriptor_type;
-    uint16_t m_avdecc_descriptor_index;
-    string m_description;
     uint16_t m_avdecc_control_value_type;
-    DescriptorString m_object_name;
     vector<ControlValue> m_control_point_values;
 };
 

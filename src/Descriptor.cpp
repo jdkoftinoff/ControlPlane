@@ -18,40 +18,6 @@ void DescriptorBase::collectOwnedDescriptors( DescriptorCounts &counts )
     }
 }
 
-ControlIdentity DescriptorBase::getControlIdentity() const
-{
-    ControlIdentity r = ControlIdentity{getAvdeccDescriptorType(), getAvdeccDescriptorIndex()};
-    return r;
-}
-
-ControlIdentity DescriptorBase::getControlIdentityForItem( uint16_t item_num ) const
-{
-    ControlIdentity r
-        = ControlIdentity( getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionWPosLevel, item_num );
-    return r;
-}
-
-ControlIdentity DescriptorBase::getControlIdentityForItem( uint16_t item_num, uint16_t h_pos ) const
-{
-    ControlIdentity r = ControlIdentity(
-        getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionWPosLevel, item_num, h_pos );
-    return r;
-}
-
-ControlIdentity DescriptorBase::getControlIdentityForItem( uint16_t item_num, uint16_t h_pos, uint16_t w_pos ) const
-{
-    ControlIdentity r = ControlIdentity(
-        getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionHPosLevel, item_num, h_pos, w_pos );
-    return r;
-}
-
-ControlIdentity DescriptorBase::getControlIdentityForName( uint16_t name_num ) const
-{
-    ControlIdentity r
-        = ControlIdentity( getAvdeccDescriptorType(), getAvdeccDescriptorIndex(), ControlIdentity::SectionName, name_num );
-    return r;
-}
-
 void DescriptorBase::addChildDescriptor( std::shared_ptr<DescriptorBase> d )
 {
     auto const &v = m_child_descriptors.find( d->getAvdeccDescriptorType() );

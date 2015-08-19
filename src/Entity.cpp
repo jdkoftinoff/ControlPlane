@@ -14,37 +14,15 @@ Entity::Entity( std::string description,
                 DescriptorString *serial_number,
                 RangedValueEUI64 *entity_id,
                 RangedValueEUI64 *entity_model_id )
-    : m_avdecc_descriptor_type( AVDECC_DESCRIPTOR_ENTITY ), m_description( description )
+    : DescriptorBase( description, descriptor_type )
 {
-    m_names.push_back( entity_name );
-    m_names.push_back( group_name );
+    addName( group_name );
     m_items.push_back( ControlValue{"name", entity_name} );
     m_items.push_back( ControlValue{"group", group_name} );
     m_items.push_back( ControlValue{"firmware_version", firmware_version} );
     m_items.push_back( ControlValue{"serial_number", serial_number} );
     m_items.push_back( ControlValue{"entity_id", entity_id} );
     m_items.push_back( ControlValue{"entity_model_id", entity_model_id} );
-}
-
-const DescriptorString *Entity::getName( size_t name_index ) const
-{
-    DescriptorString *r = m_names[name_index];
-
-    return r;
-}
-
-DescriptorString *Entity::getName( size_t name_index )
-{
-    DescriptorString *r = m_names[name_index];
-
-    return r;
-}
-
-bool Entity::setName( std::string val, size_t name_index )
-{
-    DescriptorString *r = m_names[name_index];
-
-    return r->setValue( val );
 }
 
 ControlValue &Entity::getValue( size_t item_num, size_t w, size_t h )
@@ -81,8 +59,8 @@ void Entity::fillWriteAccess( ControlIdentityComparatorSetPtr &write_access )
 
 void Entity::storeToPDU( ControlPlane::FixedBuffer &pdu ) const
 {
-    pdu.putDoublet( m_avdecc_descriptor_type );
-    pdu.putDoublet( m_avdecc_descriptor_index );
+    pdu.putDoublet( getAvdeccDescriptorType() );
+    pdu.putDoublet( getAvdeccDescriptorIndex() );
     pdu.putEUI64( m_items[ItemForEntityId].m_ranged_value->getUnencodedValueUInt64() );
     pdu.putEUI64( m_items[ItemForEntityModelId].m_ranged_value->getUnencodedValueUInt64() );
     pdu.putQuadlet( 0 );     // entity_capabilities

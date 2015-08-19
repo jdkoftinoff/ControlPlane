@@ -11,12 +11,6 @@ namespace Descriptor
 
 class Entity : public DescriptorBase
 {
-  protected:
-    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) override
-    {
-        m_avdecc_descriptor_index = new_descriptor_index;
-    }
-
   public:
     static const uint16_t descriptor_type = AVDECC_DESCRIPTOR_ENTITY;
 
@@ -27,27 +21,8 @@ class Entity : public DescriptorBase
             DescriptorString *serial_number,
             RangedValueEUI64 *entity_id,
             RangedValueEUI64 *entity_model_id );
-    virtual ~Entity() {}
 
-    uint16_t getNumNames() const override { return (uint16_t)m_names.size(); }
-
-    DescriptorString const *getName( size_t name_index = 0 ) const override;
-
-    DescriptorString *getName( size_t name_index = 0 ) override;
-
-    bool setName( string val, size_t name_index = 0 ) override;
-
-    uint64_t getAvdeccControlType() const override { return 0; }
-
-    uint16_t getAvdeccDescriptorType() const override { return m_avdecc_descriptor_type; }
-
-    uint16_t getAvdeccDescriptorIndex() const override { return m_avdecc_descriptor_index; }
-
-    string getDescription() const override { return m_description; }
-
-    uint16_t getAvdeccControlValueType() const override { return AVDECC_CONTROL_VALUE_UTF8; }
-
-    uint16_t getNumValues() const override { return (uint16_t)m_items.size(); }
+    uint16_t getNumValues() const override { return m_items.size(); }
 
     uint16_t getWidth() const override { return 1; }
 
@@ -71,12 +46,7 @@ class Entity : public DescriptorBase
         ItemForEntityModelId
     };
 
-    uint16_t m_avdecc_descriptor_type;
-    uint16_t m_avdecc_descriptor_index;
-    string m_description;
-
     std::vector<ControlValue> m_items;
-    std::vector<DescriptorString *> m_names;
 };
 
 inline EntityPtr makeEntity( std::string description,
