@@ -8,15 +8,6 @@ namespace Descriptor
 {
 
 template <typename T>
-void collectOwnedDescriptorsInVector( DescriptorCounts &counts, std::vector<std::shared_ptr<T> > &items )
-{
-    for ( auto &i : items )
-    {
-        i->collectOwnedDescriptors( counts );
-    }
-}
-
-template <typename T>
 void putDescriptorCounts( FixedBuffer &pdu, const std::vector<std::shared_ptr<T> > &items )
 {
     if ( items.size() > 0 )
@@ -30,7 +21,7 @@ void Configuration::storeToPDU( FixedBuffer &pdu ) const
 {
     pdu.putDoublet( getAvdeccDescriptorType() );
     pdu.putDoublet( getAvdeccDescriptorIndex() );
-    pdu.putAvdeccString( getName( 0 )->getValue() );
+    pdu.putAvdeccString( getName( "object_name" ).m_ranged_value->getUnencodedValueString() );
     pdu.putDoublet( 0xffff );
 
     size_t descriptor_counts_count = getChildDescriptors().size();

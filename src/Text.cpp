@@ -253,21 +253,14 @@ void TextProtocolSession::handleIndividualGet( Milliseconds current_time_in_mill
 {
     string r;
     m_schema.getValue( &r, address );
-    if ( m_schema.isStorageTypeString( address ) )
-    {
-        m_io.sendLine( formstring( address, "='", Util::escapeString( r ), "'" ) );
-    }
-    else
-    {
-        m_io.sendLine( formstring( address, "=", r ) );
-    }
+    m_io.sendLine( formstring( address, "='", Util::escapeString( r ), "'" ) );
 }
 
 void TextProtocolSession::handleIndividualSet( Milliseconds current_time_in_milliseconds,
                                                const TextAddress &address,
                                                const string &v )
 {
-    if ( m_schema.isStorageTypeString( address ) )
+    if ( m_schema.isStorageTypeString( address ) || ( ( v.length() > 2 ) && ( v[0] == '\'' || v[0] == '"' ) ) )
     {
         string unescaped = unEscapeString( v );
         m_schema.setValue( m_write_access, current_time_in_milliseconds, unescaped, address );
@@ -291,16 +284,22 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
     std::stringstream response;
     response << formstring( "?{'", escapeString( address.m_value ), "'" );
 
-    if ( identity.m_section == ControlIdentity::SectionDescriptorLevel )
+    if ( identity.m_section == ControlIdentity::SectionDescriptorLevel
+         || identity.m_section == ControlIdentity::SectionWPosLevel )
     {
         DescriptorPtr d = m_schema.getTarget().getDescriptor( identity );
 
         response << ": { ";
-        response << "'control_type' : 0x" << std::hex << d->getAvdeccControlType() << std::dec << ", ";
-        response << "'control_value_type' : " << d->getAvdeccControlValueType() << ", ";
-        response << "'name' : '" << escapeString( d->getName()->getValue() ) << "', ";
+        response << "'control_type' : '0x" << std::hex << d->getAvdeccControlType() << std::dec << "', ";
+        response << "'control_value_type' : '" << d->getAvdeccControlValueType() << "', ";
+
+        DescriptorString *object_name = d->getObjectName();
+        if ( object_name )
+        {
+            response << "'object_name' : '" << escapeString( object_name->getValue() ) << "', ";
+        }
         response << "'description' : '" << escapeString( d->getDescription() ) << "', ";
-        response << "'read_only' : '";
+        response << "'read_only' : ";
 
         bool ro = false;
 
@@ -320,13 +319,13 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
 
         if ( ro )
         {
-            response << "true";
+            response << "'true'";
         }
         else
         {
-            response << "false";
+            response << "'false'";
         }
-        response << "', ";
+        response << ", ";
         response << "'items' : [ ";
         for ( size_t item = 0; item < d->getNumValues(); ++item )
         {

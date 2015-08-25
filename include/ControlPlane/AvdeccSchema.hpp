@@ -153,4 +153,5 @@
 
 namespace ControlPlane
 {
+extern std::string avdeccDescriptorTypeName[];
 }

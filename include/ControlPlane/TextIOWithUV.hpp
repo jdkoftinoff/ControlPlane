@@ -23,7 +23,7 @@ class TextIOWithUV : public TextIO
     size_t m_maxqueuesize;
 
   public:
-    TextIOWithUV() : m_maxqueuesize( 100 ) {}
+    TextIOWithUV() : m_maxqueuesize( 3000 ) {}
 
     void sendLine( string const &line ) override
     {
@@ -78,6 +78,18 @@ class TextIOWithUV : public TextIO
         {
             return false;
         }
+    }
+
+    size_t UVToNetworkSize()
+    {
+        std::lock_guard<std::recursive_mutex> hold( m_mutex );
+        return m_output.size();
+    }
+
+    size_t UVFromNetworkSize()
+    {
+        std::lock_guard<std::recursive_mutex> hold( m_mutex );
+        return m_input.size();
     }
 };
 

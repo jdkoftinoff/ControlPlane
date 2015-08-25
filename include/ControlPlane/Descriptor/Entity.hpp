@@ -36,17 +36,17 @@ class Entity : public DescriptorBase
 
     void storeToPDU( FixedBuffer &pdu ) const override;
 
-    enum
-    {
-        ItemForName = 0,
-        ItemForGroup,
-        ItemForFirmwareVersion,
-        ItemForSerialNumber,
-        ItemForEntityId,
-        ItemForEntityModelId
-    };
-
     std::vector<ControlValue> m_items;
+};
+
+struct EntityInfo
+{
+    DescriptorString m_entity_name;
+    DescriptorString m_entity_group;
+    DescriptorString m_firmware_version;
+    DescriptorString m_serial_number;
+    RangedValueEUI64 m_entity_id;
+    RangedValueEUI64 m_entity_model_id;
 };
 
 inline EntityPtr makeEntity( std::string description,
@@ -59,6 +59,17 @@ inline EntityPtr makeEntity( std::string description,
 {
     return EntityPtr(
         new Entity( description, entity_name, group_name, firmware_version, serial_number, entity_id, entity_model_id ) );
+}
+
+inline EntityPtr makeEntity( std::string description, EntityInfo *a )
+{
+    return EntityPtr( new Entity( description,
+                                  &a->m_entity_name,
+                                  &a->m_entity_group,
+                                  &a->m_firmware_version,
+                                  &a->m_serial_number,
+                                  &a->m_entity_id,
+                                  &a->m_entity_model_id ) );
 }
 }
 }

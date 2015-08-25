@@ -63,7 +63,6 @@ struct TextProtocolSession
                          bool echo = false )
         : m_io( io ), m_schema( schema ), m_notifier( schema ), m_write_access( write_access ), m_echo( echo )
     {
-        m_schema.collectDescriptors();
     }
 
     virtual ~TextProtocolSession() {}

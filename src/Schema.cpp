@@ -8,10 +8,77 @@ using Util::formstring;
 void Schema::collectDescriptors()
 {
     std::lock_guard<std::recursive_mutex> lock( m_access_mutex );
-    m_top_level->enumerate( [=]( const SchemaAddress &address, DescriptorPtr descriptor )
+    m_top_level->enumerate(
+        [=]( const SchemaAddress &address, DescriptorPtr descriptor, ControlIdentity identity )
+        {
+            SchemaAddress sub = address;
+
+            for ( uint16_t i = 0; i < descriptor->getNumProperties(); ++i )
+            {
+                sub.push_back( descriptor->getPropertyName( i ) );
+                m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForProperty( i ) );
+                sub.pop_back();
+            }
+            if ( descriptor->getHeight() > 1 && descriptor->getWidth() > 1 && descriptor->getNumValues() > 0 )
+            {
+                for ( uint16_t h = 0; h < descriptor->getHeight(); ++h )
+                {
+                    sub.push_back( formstring( h + 1 ) );
+
+                    for ( uint16_t w = 0; w < descriptor->getWidth(); ++w )
+                    {
+                        sub.push_back( formstring( w + 1 ) );
+
+                        if ( descriptor->getNumValues() == 1 )
+                        {
+                            m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForItem( 0, h, w ) );
+                        }
+                        else
+                        {
+                            for ( uint16_t i = 0; i < descriptor->getNumValues(); ++i )
                             {
-                                ControlIdentity identity = descriptor->getControlIdentity();
-                                m_descriptor_avdecc_map[identity] = descriptor;
+                                sub.push_back( formstring( i + 1 ) );
+                                m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForItem( i, h, w ) );
+                                sub.pop_back();
+                            }
+                        }
+                        sub.pop_back();
+                    }
+                    sub.pop_back();
+                }
+            }
+            else
+            {
+                if ( descriptor->getHeight() == 1 && descriptor->getWidth() == 1 && descriptor->getNumValues() > 1 )
+                {
+                    for ( uint16_t i = 0; i < descriptor->getNumValues(); ++i )
+                    {
+                        sub.push_back( formstring( i + 1 ) );
+                        m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForItem( i, 0, 0 ) );
+                        sub.pop_back();
+                    }
+                }
+                else
+                {
+                    if ( descriptor->getHeight() == 1 && descriptor->getWidth() == 1 && descriptor->getNumValues() == 1 )
+                    {
+                        m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForItem( 0, 0, 0 ) );
+                    }
+                }
+            }
+
+        } );
+
+    m_top_level->updateControlIdentities();
+
+    m_top_level->enumerate( [=]( const SchemaAddress &address, DescriptorPtr descriptor, ControlIdentity identity )
+                            {
+                                ControlIdentity descriptor_identity = identity;
+                                descriptor_identity.m_section = ControlIdentity::SectionDescriptorLevel;
+                                descriptor_identity.m_h_pos = 0;
+                                descriptor_identity.m_w_pos = 0;
+                                descriptor_identity.m_item = 0;
+                                m_descriptor_avdecc_map[descriptor_identity] = descriptor;
                                 m_address_map[address] = identity;
                                 m_identity_map[identity] = address;
                             } );
@@ -89,17 +156,21 @@ RangedValueBase const *
     switch ( identity.m_section )
     {
     case ControlIdentity::SectionName:
-        r = d->getName( item_num );
+        r = d->getName( item_num + identity.m_item ).m_ranged_value;
+        break;
+
+    case ControlIdentity::SectionProperty:
+        r = d->getProperty( item_num + identity.m_item ).m_ranged_value;
         break;
 
     case ControlIdentity::SectionDescriptorLevel:
     case ControlIdentity::SectionWPosLevel:
     case ControlIdentity::SectionHPosLevel:
-        if ( d->getNumValues() > item_num )
+        if ( d->getNumValues() > item_num + identity.m_item )
         {
-            if ( d->getHeight() > h_pos )
+            if ( d->getHeight() > h_pos + identity.m_h_pos )
             {
-                if ( d->getWidth() > w_pos )
+                if ( d->getWidth() > w_pos + identity.m_w_pos )
                 {
                     r = d->getValue( item_num + identity.m_item, w_pos + identity.m_w_pos, h_pos + identity.m_h_pos )
                             .m_ranged_value;
@@ -116,11 +187,18 @@ RangedValueBase const *
     {
         if ( d->getNumNames() > 0 )
         {
-            r = d->getName( 0 );
+            r = d->getName( 0 ).m_ranged_value;
         }
         else
         {
-            throw SchemaErrorNoSuchControlIdentity( identity );
+            if ( d->getNumProperties() > 0 )
+            {
+                r = d->getProperty( 0 ).m_ranged_value;
+            }
+            else
+            {
+                throw SchemaErrorNoSuchControlIdentity( identity );
+            }
         }
     }
 
@@ -149,8 +227,13 @@ RangedValueBase *Schema::getRangedValueForControlIdentity(
 
         switch ( identity.m_section )
         {
+        case ControlIdentity::SectionProperty:
+            r = d->getProperty( item_num ).m_ranged_value;
+            break;
+
         case ControlIdentity::SectionName:
-            r = d->getName( item_num );
+            r = d->getName( item_num ).m_ranged_value;
+            ;
             break;
 
         case ControlIdentity::SectionDescriptorLevel:
@@ -177,7 +260,8 @@ RangedValueBase *Schema::getRangedValueForControlIdentity(
         {
             if ( d->getNumNames() > 0 )
             {
-                r = d->getName( 0 );
+                r = d->getName( 0 ).m_ranged_value;
+                ;
             }
             else
             {

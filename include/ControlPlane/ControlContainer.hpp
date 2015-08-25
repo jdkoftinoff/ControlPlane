@@ -71,6 +71,10 @@ class ControlContainer
     ///
     DescriptorPtr addItem( const SchemaAddressElement &subnode, DescriptorPtr info );
 
+    DescriptorPtr addItem( const SchemaAddressElement &subnode, DescriptorPtr item, ControlIdentity identity );
+
+    DescriptorPtr addItem( const SchemaAddress &address, DescriptorPtr item, ControlIdentity identity );
+
     ///
     /// \brief removeItem
     ///
@@ -119,10 +123,14 @@ class ControlContainer
     ///
     DescriptorAddressMap &getControlPointItems() { return m_control_point_items; }
 
-    void enumerate( std::function<void( const SchemaAddress &address, DescriptorPtr descriptor )> callback );
+    void updateControlIdentities();
 
-    void enumerate( std::function<void( const SchemaAddress &address, DescriptorPtr descriptor )> callback,
-                    SchemaAddress &working_address );
+    void enumerate(
+        std::function<void( const SchemaAddress &address, DescriptorPtr descriptor, ControlIdentity identity )> callback );
+
+    void enumerate(
+        std::function<void( const SchemaAddress &address, DescriptorPtr descriptor, ControlIdentity identity )> callback,
+        SchemaAddress &working_address );
 
   private:
     ControlContainerMap m_container_items;

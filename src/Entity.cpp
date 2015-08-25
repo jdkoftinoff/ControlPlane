@@ -16,13 +16,12 @@ Entity::Entity( std::string description,
                 RangedValueEUI64 *entity_model_id )
     : DescriptorBase( description, descriptor_type )
 {
-    addName( group_name );
-    m_items.push_back( ControlValue{"name", entity_name} );
-    m_items.push_back( ControlValue{"group", group_name} );
-    m_items.push_back( ControlValue{"firmware_version", firmware_version} );
-    m_items.push_back( ControlValue{"serial_number", serial_number} );
-    m_items.push_back( ControlValue{"entity_id", entity_id} );
-    m_items.push_back( ControlValue{"entity_model_id", entity_model_id} );
+    addProperty( "name", entity_name );
+    addProperty( "group", group_name );
+    addProperty( "firmware_version", firmware_version );
+    addProperty( "serial_number", serial_number );
+    addProperty( "entity_id", entity_id );
+    addProperty( "entity_model_id", entity_model_id );
 }
 
 ControlValue &Entity::getValue( size_t item_num, size_t w, size_t h )
@@ -51,18 +50,19 @@ const ControlValue &Entity::getValue( size_t item_num, size_t w, size_t h ) cons
 
 void Entity::fillWriteAccess( ControlIdentityComparatorSetPtr &write_access )
 {
-    write_access->addItem( getControlIdentityForItem( ItemForEntityId ) );
-    write_access->addItem( getControlIdentityForItem( ItemForEntityModelId ) );
-    write_access->addItem( getControlIdentityForItem( ItemForSerialNumber ) );
-    write_access->addItem( getControlIdentityForItem( ItemForFirmwareVersion ) );
+    write_access->addItem( getControlIdentityForProperty( "entity_id" ) );
+    write_access->addItem( getControlIdentityForProperty( "entity_model_id" ) );
+    write_access->addItem( getControlIdentityForProperty( "serial_number" ) );
+    write_access->addItem( getControlIdentityForProperty( "firmware_version" ) );
 }
 
 void Entity::storeToPDU( ControlPlane::FixedBuffer &pdu ) const
 {
     pdu.putDoublet( getAvdeccDescriptorType() );
     pdu.putDoublet( getAvdeccDescriptorIndex() );
-    pdu.putEUI64( m_items[ItemForEntityId].m_ranged_value->getUnencodedValueUInt64() );
-    pdu.putEUI64( m_items[ItemForEntityModelId].m_ranged_value->getUnencodedValueUInt64() );
+
+    pdu.putEUI64( getProperty( "entity_id" ).m_ranged_value->getUnencodedValueUInt64() );
+    pdu.putEUI64( getProperty( "entity_model_id" ).m_ranged_value->getUnencodedValueUInt64() );
     pdu.putQuadlet( 0 );     // entity_capabilities
     pdu.putDoublet( 0 );     // talker_stream_sources
     pdu.putDoublet( 0 );     // talker_capabilities
@@ -71,12 +71,12 @@ void Entity::storeToPDU( ControlPlane::FixedBuffer &pdu ) const
     pdu.putQuadlet( 0 );     // controller_capabilities
     pdu.putQuadlet( 0 );     // available_index
     pdu.putEUI64( Eui64() ); // association_id
-    pdu.putAvdeccString( m_items[ItemForName].m_ranged_value->getUnencodedValueString() );
+    pdu.putAvdeccString( getProperty( "name" ).m_ranged_value->getUnencodedValueString() );
     pdu.putDoublet( 0 ); // vendor_name_string
     pdu.putDoublet( 0 ); // model_name_string
-    pdu.putAvdeccString( m_items[ItemForFirmwareVersion].m_ranged_value->getUnencodedValueString() );
-    pdu.putAvdeccString( m_items[ItemForGroup].m_ranged_value->getUnencodedValueString() );
-    pdu.putAvdeccString( m_items[ItemForSerialNumber].m_ranged_value->getUnencodedValueString() );
+    pdu.putAvdeccString( getProperty( "firmware_version" ).m_ranged_value->getUnencodedValueString() );
+    pdu.putAvdeccString( getProperty( "group" ).m_ranged_value->getUnencodedValueString() );
+    pdu.putAvdeccString( getProperty( "serial_number" ).m_ranged_value->getUnencodedValueString() );
     pdu.putDoublet( (uint16_t)1 ); // configurations_count
     pdu.putDoublet( 0 );           // current_configuration
 }

@@ -47,8 +47,6 @@ class Matrix : public DescriptorBase
 
     void storeToPDU( FixedBuffer &pdu ) const override;
 
-    void collectOwnedDescriptors( DescriptorCounts &counts ) override;
-
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_control_value_type;
     vector<vector<vector<ControlValue> > > m_control_point_values;

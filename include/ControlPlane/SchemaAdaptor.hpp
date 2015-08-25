@@ -34,15 +34,7 @@ class SchemaAdaptorBase
     virtual void collectDescriptors();
 
   protected:
-    virtual void collectDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor );
-
-    virtual void collectEntityDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor );
-
-    virtual void collectMatrixDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor );
-
-    virtual void collectControlDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor );
-
-    virtual void collectOtherDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor );
+    virtual void collectDescriptor( const SchemaAddress &schema_address, DescriptorPtr descriptor, ControlIdentity identity );
 
     virtual void collectItem( ControlIdentity const &identity, SchemaAddress const &schema_address ) = 0;
 
@@ -303,6 +295,19 @@ class SchemaAdaptor : public SchemaAdaptorBase
         {
             m_address_map[address] = identity;
             m_identity_map[identity] = address;
+#if 0
+            std::cout << "Collected. Address Map:" << std::endl;
+            for( auto i = m_address_map.begin(); i!=m_address_map.end(); ++i )
+            {
+                std::cout << i->first << " -> " << i->second << std::endl;
+            }
+
+            std::cout << "Identity Map:" << std::endl;
+            for( auto i = m_identity_map.begin(); i!=m_identity_map.end(); ++i )
+            {
+                std::cout << i->first << " -> " << i->second << std::endl;
+            }
+#endif
         }
     }
 

@@ -29,31 +29,9 @@ struct ProcessingSnapshot
     std::array<OutputProcessing, 24> m_output;
 };
 
-struct EntityInfo
-{
-    DescriptorString m_entity_name;
-    DescriptorString m_entity_group;
-    DescriptorString m_firmware_version;
-    DescriptorString m_serial_number;
-    RangedValueEUI64 m_entity_id;
-    RangedValueEUI64 m_entity_model_id;
-};
-
-inline Descriptor::EntityPtr makeEntity( std::string description, EntityInfo *entity_info )
-{
-    Descriptor::EntityPtr entity = Descriptor::makeEntity( "Example",
-                                                           &entity_info->m_entity_name,
-                                                           &entity_info->m_entity_group,
-                                                           &entity_info->m_firmware_version,
-                                                           &entity_info->m_serial_number,
-                                                           &entity_info->m_entity_id,
-                                                           &entity_info->m_entity_model_id );
-    return entity;
-}
-
 struct DeviceInfo
 {
-    EntityInfo m_entity;
+    Descriptor::EntityInfo m_entity;
 };
 
 class ExampleSchemaGenerator : public SchemaGenerator
@@ -91,7 +69,7 @@ class ExampleSchemaGenerator : public SchemaGenerator
         }
 
         entity->addChildDescriptor( configuration );
-        entity->collectOwnedDescriptors( m_counts );
+        entity->collectOwnedDescriptors( m_counts, m_root );
 
         return m_root;
     }

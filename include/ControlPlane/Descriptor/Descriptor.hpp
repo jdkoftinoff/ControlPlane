@@ -10,56 +10,86 @@
 
 namespace ControlPlane
 {
+class ControlContainer;
+using ControlContainerPtr = std::shared_ptr<ControlContainer>;
 namespace Descriptor
 {
+class DescriptorBase;
+using DescriptorPropertyMap = std::map<std::string, ControlValue>;
+using DescriptorProperties = std::vector<ControlValue>;
+using DescriptorNames = std::vector<ControlValue>;
+using DescriptorPtr = shared_ptr<DescriptorBase>;
+using DescriptorAddressMap = map<SchemaAddressElement, std::pair<DescriptorPtr, ControlIdentity> >;
+using DescriptorAvdeccMap = map<ControlIdentity, DescriptorPtr>;
+using DescriptorVector = std::vector<DescriptorPtr>;
+using DescriptorMap = std::map<DescriptorType, DescriptorVector>;
 
-class DescriptorBase
+class DescriptorBase : public std::enable_shared_from_this<DescriptorBase>
 {
     std::string m_description;
-    uint16_t m_descriptor_type;
-    uint16_t m_descriptor_index;
-    DescriptorString m_object_name;
-    std::vector<DescriptorString *> m_names;
-    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > m_child_descriptors;
+    DescriptorType m_descriptor_type;
+    DescriptorIndex m_descriptor_index;
+    DescriptorMap m_child_descriptor_map;
+    DescriptorPropertyMap m_property_map;
+    DescriptorProperties m_properties;
+    DescriptorNames m_names;
 
   protected:
     DescriptorBase( std::string description, uint16_t descriptor_type, uint16_t descriptor_index = 0 )
         : m_description( description ), m_descriptor_type( descriptor_type ), m_descriptor_index( descriptor_index )
     {
-        m_names.push_back( &m_object_name );
     }
 
-    void setAvdeccDescriptorIndex( uint16_t new_descriptor_index ) { m_descriptor_index = new_descriptor_index; }
+    void setAvdeccDescriptorIndex( DescriptorIndex new_descriptor_index ) { m_descriptor_index = new_descriptor_index; }
 
-    void addName( DescriptorString *n ) { m_names.push_back( n ); }
+    void addName( std::string name, DescriptorString *n )
+    {
+        addProperty( name, n );
+        m_names.push_back( ControlValue( name, n ) );
+    }
+
+    void addProperty( std::string name, RangedValueBase *v )
+    {
+        m_property_map[name] = ControlValue( name, v );
+        m_properties.push_back( ControlValue( name, v ) );
+    }
 
   public:
-    uint16_t getAvdeccDescriptorType() const { return m_descriptor_type; }
-
-    uint16_t getAvdeccDescriptorIndex() const { return m_descriptor_index; }
-
-    uint16_t getNumNames() const { return (uint16_t)m_names.size(); }
-
-    DescriptorString const *getName( size_t name_index = 0 ) const { return m_names[name_index]; }
-
-    DescriptorString *getName( size_t name_index = 0 ) { return m_names[name_index]; }
-
-    bool setName( string val, size_t name_index = 0 ) { return m_names[name_index]->setValue( val ); }
+    virtual ~DescriptorBase() {}
 
     string const &getDescription() const { return m_description; }
 
-    virtual ~DescriptorBase() {}
+    DescriptorType getAvdeccDescriptorType() const { return m_descriptor_type; }
+
+    DescriptorIndex getAvdeccDescriptorIndex() const { return m_descriptor_index; }
+
+    virtual DescriptorString *getObjectName() { return 0; }
+
+    virtual const DescriptorString *getObjectName() const { return 0; }
+
+    virtual bool setObjectName( string value ) { return false; }
+
+    uint16_t getNumProperties() const { return (uint16_t)m_properties.size(); }
+
+    ControlValue getProperty( uint16_t item ) const { return m_properties.at( item ); }
+
+    ControlValue getProperty( string name ) const { return m_property_map.at( name ); }
+
+    uint16_t getNumNames() const { return (uint16_t)m_names.size(); }
+
+    ControlValue getName( std::string name ) const { return m_property_map.at( name ); }
+
+    ControlValue getName( uint16_t num ) const { return m_names[num]; }
+
+    bool setName( uint16_t num, std::string value ) { return getName( num ).m_ranged_value->setUnencodedValueString( value ); }
 
     virtual void fillWriteAccess( ControlIdentityComparatorSetPtr &write_access ) = 0;
-    virtual void collectOwnedDescriptors( DescriptorCounts &counts );
+    virtual void collectOwnedDescriptors( DescriptorCounts &counts, ControlContainerPtr &top );
     virtual void storeToPDU( FixedBuffer &pdu ) const = 0;
 
-    virtual uint64_t getAvdeccControlType() const { throw std::runtime_error( "no getAvdeccControlType for descriptor" ); }
+    virtual ControlType getAvdeccControlType() const { return 0; }
 
-    virtual uint16_t getAvdeccControlValueType() const
-    {
-        throw std::runtime_error( "no getAvdeccControlValueType for descriptor" );
-    }
+    virtual ControlValueType getAvdeccControlValueType() const { return 0; }
 
     virtual uint16_t getNumValues() const { return 0; }
 
@@ -76,6 +106,28 @@ class DescriptorBase
     {
         throw std::runtime_error( "no getValue for descriptor" );
     }
+
+    ControlIdentity getControlIdentityForProperty( std::string const &item_name ) const
+    {
+        ControlIdentity r = getControlIdentity();
+        for ( uint16_t i = 0; i < m_properties.size(); ++i )
+        {
+            if ( m_properties[i].m_name == item_name )
+            {
+                r.m_section = ControlIdentity::Section::SectionProperty;
+                r.m_item = i;
+                break;
+            }
+        }
+        return r;
+    }
+
+    ControlIdentity getControlIdentityForProperty( uint16_t item_num ) const
+    {
+        return ControlIdentity( m_descriptor_type, m_descriptor_index, ControlIdentity::Section::SectionProperty, item_num );
+    }
+
+    std::string getPropertyName( uint16_t item_num ) const { return getProperty( item_num ).m_name; }
 
     ControlIdentity getControlIdentity() const { return ControlIdentity( m_descriptor_type, m_descriptor_index ); }
 
@@ -113,18 +165,14 @@ class DescriptorBase
     std::vector<std::shared_ptr<DescriptorBase> > *getChildDescriptorsForType( uint16_t type );
     const std::vector<std::shared_ptr<DescriptorBase> > *getChildDescriptorsForType( uint16_t type ) const;
 
-    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > &getChildDescriptors() { return m_child_descriptors; }
+    std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > &getChildDescriptors() { return m_child_descriptor_map; }
 
     std::map<uint16_t, std::vector<std::shared_ptr<DescriptorBase> > > const &getChildDescriptors() const
     {
-        return m_child_descriptors;
+        return m_child_descriptor_map;
     }
 
   private:
 };
-
-using DescriptorPtr = shared_ptr<DescriptorBase>;
-using DescriptorAddressMap = map<SchemaAddressElement, DescriptorPtr>;
-using DescriptorAvdeccMap = map<ControlIdentity, DescriptorPtr>;
 }
 }

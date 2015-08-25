@@ -36,6 +36,7 @@ template <typename T2>
 inline bool integer_pow10( bool &r, T2 exponent )
 {
     r = false;
+    return r;
 }
 
 template <typename T2>

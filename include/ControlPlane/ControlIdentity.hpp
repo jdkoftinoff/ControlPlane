@@ -11,6 +11,7 @@ struct ControlIdentity
     enum Section
     {
         SectionDescriptorLevel,
+        SectionProperty,
         SectionName,
         SectionHPosLevel,
         SectionWPosLevel
@@ -26,8 +27,8 @@ struct ControlIdentity
     {
     }
 
-    ControlIdentity( uint16_t descriptor_type,
-                     uint16_t descriptor_index,
+    ControlIdentity( DescriptorType descriptor_type,
+                     DescriptorIndex descriptor_index,
                      Section section = SectionDescriptorLevel,
                      uint16_t item = 0,
                      uint16_t h_pos = 0,
@@ -45,8 +46,8 @@ struct ControlIdentity
 
     ControlIdentity &operator=( const ControlIdentity &other ) = default;
 
-    uint16_t m_descriptor_type;
-    uint16_t m_descriptor_index;
+    DescriptorType m_descriptor_type;
+    DescriptorIndex m_descriptor_index;
     Section m_section;
     uint16_t m_item;
     uint16_t m_h_pos;

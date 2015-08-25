@@ -20,6 +20,22 @@ class ControlIdentityComparator
     virtual int compare( ControlIdentityComparator const &other ) const = 0;
 };
 
+class ControlIdentityComparator_compare
+{
+  public:
+    bool operator()( const std::shared_ptr<ControlIdentityComparator> &lhs,
+                     const std::shared_ptr<ControlIdentityComparator> &rhs ) const
+    {
+        bool r = false;
+
+        if ( lhs->compare( *rhs ) == -1 )
+        {
+            r = true;
+        }
+        return r;
+    }
+};
+
 inline bool operator==( const ControlIdentityComparator &lhs, const ControlIdentityComparator &rhs )
 {
     bool r = false;

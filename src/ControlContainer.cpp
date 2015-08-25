@@ -25,8 +25,34 @@ ControlContainerPtr ControlContainer::addItem( const SchemaAddressElement &subno
 
 DescriptorPtr ControlContainer::addItem( const SchemaAddressElement &subnode, DescriptorPtr item )
 {
-    removeItem( subnode );
-    m_control_point_items[subnode] = item;
+    m_control_point_items[subnode] = std::make_pair( item, item->getControlIdentity() );
+    return item;
+}
+
+DescriptorPtr ControlContainer::addItem( const SchemaAddressElement &subnode, DescriptorPtr item, ControlIdentity identity )
+{
+    m_control_point_items[subnode] = std::make_pair( item, identity );
+    return item;
+}
+
+DescriptorPtr ControlContainer::addItem( const SchemaAddress &address, DescriptorPtr item, ControlIdentity identity )
+{
+    if ( address.size() == 1 )
+    {
+        addItem( address[0], item, identity );
+    }
+    else
+    {
+        SchemaAddress tmp;
+        std::copy( address.begin() + 1, address.end(), std::back_inserter( tmp ) );
+
+        if ( m_container_items.find( address[0] ) == m_container_items.end() )
+        {
+            addItem( address[0] );
+        }
+
+        m_container_items.at( address[0] ).get()->addItem( tmp, item, identity );
+    }
     return item;
 }
 
@@ -48,11 +74,11 @@ DescriptorPtr ControlContainer::findDescriptor( const SchemaAddress &address, un
 {
     if ( address.size() == address_item + 1 )
     {
-        return m_control_point_items[address[address_item]];
+        return m_control_point_items.at( address.at( address_item ) ).first;
     }
     else
     {
-        ControlContainerPtr container = m_container_items[address[address_item]];
+        ControlContainerPtr container = m_container_items.at( address.at( address_item ) );
         return container->findDescriptor( address, address_item + 1 );
     }
 }
@@ -70,14 +96,36 @@ ControlContainerPtr ControlContainer::findControlContainer( const SchemaAddress 
     }
 }
 
-void ControlContainer::enumerate( std::function<void( const SchemaAddress &, DescriptorPtr )> callback )
+void ControlContainer::updateControlIdentities()
+{
+    for ( auto item = m_container_items.begin(); item != m_container_items.end(); ++item )
+    {
+        item->second->updateControlIdentities();
+    }
+
+    for ( auto item = m_control_point_items.begin(); item != m_control_point_items.end(); ++item )
+    {
+        DescriptorPtr &descriptor = item->second.first;
+        ControlIdentity &identity = item->second.second;
+
+        if ( identity.m_descriptor_type != descriptor->getAvdeccDescriptorType()
+             || identity.m_descriptor_index != descriptor->getAvdeccDescriptorIndex() )
+        {
+            identity.m_descriptor_type = descriptor->getAvdeccDescriptorType();
+            identity.m_descriptor_index = descriptor->getAvdeccDescriptorIndex();
+        }
+    }
+}
+
+void ControlContainer::enumerate( std::function<void( const SchemaAddress &, DescriptorPtr, ControlIdentity )> callback )
 {
     SchemaAddress working_address;
     enumerate( callback, working_address );
 }
 
-void ControlContainer::enumerate( std::function<void( const SchemaAddress &, DescriptorPtr )> callback,
-                                  SchemaAddress &working_address )
+void
+    ControlContainer::enumerate( std::function<void( const SchemaAddress &, DescriptorPtr, ControlIdentity identity )> callback,
+                                 SchemaAddress &working_address )
 {
     for ( auto item = m_container_items.begin(); item != m_container_items.end(); ++item )
     {
@@ -88,8 +136,11 @@ void ControlContainer::enumerate( std::function<void( const SchemaAddress &, Des
 
     for ( auto item = m_control_point_items.begin(); item != m_control_point_items.end(); ++item )
     {
-        working_address.push_back( item->first );
-        callback( working_address, item->second );
+        SchemaAddressElement const &address_element = item->first;
+        DescriptorPtr &descriptor = item->second.first;
+        ControlIdentity const &identity = item->second.second;
+        working_address.push_back( address_element );
+        callback( working_address, descriptor, identity );
         working_address.pop_back();
     }
 }

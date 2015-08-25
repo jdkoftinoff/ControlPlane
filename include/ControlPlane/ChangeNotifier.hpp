@@ -39,7 +39,7 @@ class ChangeNotifier
     Milliseconds m_min_scan_period_in_milliseconds;
     Milliseconds m_last_scan_time_in_milliseconds;
 
-    std::map<ControlIdentityComparatorPtr, ChangeNotificationState> m_subscriptions;
+    std::map<ControlIdentityComparatorPtr, ChangeNotificationState, ControlIdentityComparator_compare> m_subscriptions;
 
     friend std::ostream &operator<<( std::ostream &o, const ChangeNotifier &v );
 };

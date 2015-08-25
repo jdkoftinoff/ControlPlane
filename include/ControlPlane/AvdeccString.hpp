@@ -35,7 +35,7 @@ class AvdeccControlStringWithSize : public AvdeccString
     ///
     AvdeccControlStringWithSize() : AvdeccString( m_storage, SZ )
     {
-        for ( int i = 0; i < sizeof( m_storage ); ++i )
+        for ( size_t i = 0; i < sizeof( m_storage ); ++i )
         {
             m_storage[i] = 0;
         }

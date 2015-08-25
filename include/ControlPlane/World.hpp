@@ -63,6 +63,10 @@ using SchemaAddressElement = string;
 /// The Address type is a vector of AddressElements which describe a hierarchical address
 ///
 using SchemaAddress = vector<SchemaAddressElement>;
+using DescriptorType = uint16_t;
+using DescriptorIndex = uint16_t;
+using ControlType = uint64_t;
+using ControlValueType = uint16_t;
 }
 
 #include "Util.hpp"
