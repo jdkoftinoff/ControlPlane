@@ -37,7 +37,7 @@ void Schema::collectDescriptors()
                         {
                             for ( uint16_t i = 0; i < descriptor->getNumValues(); ++i )
                             {
-                                sub.push_back( formstring( i + 1 ) );
+                                sub.push_back( descriptor->getValue( i, w, h ).m_name );
                                 m_top_level->addItem( sub, descriptor, descriptor->getControlIdentityForItem( i, h, w ) );
                                 sub.pop_back();
                             }

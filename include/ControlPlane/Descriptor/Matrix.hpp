@@ -2,6 +2,7 @@
 
 #include "../World.hpp"
 #include "Descriptors.hpp"
+#include "MatrixSignal.hpp"
 
 namespace ControlPlane
 {
@@ -17,10 +18,22 @@ class Matrix : public DescriptorBase
         : DescriptorBase( description, descriptor_type )
         , m_avdecc_control_type( avdecc_control_type )
         , m_avdecc_control_value_type( avdecc_control_value_type )
+        , m_current_matrix_signal_descriptor( makeMatrixSignal() )
     {
+        addChildDescriptor( m_current_matrix_signal_descriptor );
     }
 
-    void addRow() { m_control_point_values.emplace_back(); }
+    ~Matrix();
+
+    void addRow( DescriptorPtr source_signal, uint16_t source_signal_output )
+    {
+        m_control_point_values.emplace_back();
+        if ( !m_current_matrix_signal_descriptor->addSignal( source_signal, source_signal_output ) )
+        {
+            m_current_matrix_signal_descriptor = makeMatrixSignal();
+            addChildDescriptor( m_current_matrix_signal_descriptor );
+        }
+    }
 
     void addColumn() { m_control_point_values.back().emplace_back(); }
 
@@ -50,7 +63,7 @@ class Matrix : public DescriptorBase
     uint64_t m_avdecc_control_type;
     uint16_t m_avdecc_control_value_type;
     vector<vector<vector<ControlValue> > > m_control_point_values;
-    vector<MatrixSignalPtr> m_matrix_signals;
+    MatrixSignalPtr m_current_matrix_signal_descriptor;
 };
 
 template <typename... T>

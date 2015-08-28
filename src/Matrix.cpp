@@ -6,5 +6,9 @@ namespace ControlPlane
 {
 namespace Descriptor
 {
+
+Matrix::~Matrix() {}
+
+void Matrix::storeToPDU( FixedBuffer &pdu ) const { /* TODO */ }
 }
 }

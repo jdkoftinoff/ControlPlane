@@ -22,6 +22,7 @@
 #include "ControlPlane/Descriptors.hpp"
 #include "ControlPlane/Eui.hpp"
 #include "ControlPlane/FixedBuffer.hpp"
+#include "ControlPlane/InternalAddress.hpp"
 #include "ControlPlane/RangedValue.hpp"
 #include "ControlPlane/Schema.hpp"
 #include "ControlPlane/SchemaGenerator.hpp"

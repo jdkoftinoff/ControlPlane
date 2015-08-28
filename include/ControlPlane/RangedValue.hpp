@@ -312,6 +312,9 @@ class RangedValue : public RangedValueBase
     static_assert( DefaultValue <= MaxValue, "DefaultValue is not less than or equal to MaxValue" );
 
   public:
+    using ranged_value_type = RangedValue;
+    using ranged_value_type_float = RangedValue;
+
     typedef ValueT value_type;
     typedef EncodedT encoded_type;
 
@@ -1061,6 +1064,9 @@ class RangedValue<UnitsValue, MinValue, MaxValue, DefaultValue, StepValue, Multi
     static_assert( DefaultValue <= MaxValue, "DefaultValue is not less than or equal to MaxValue" );
 
   public:
+    using ranged_value_type = RangedValue;
+    using ranged_value_type_string = RangedValue;
+
     typedef string value_type;
     typedef EncodedT encoded_type;
 
@@ -1631,6 +1637,9 @@ class RangedValueEUI64 : public RangedValueBase
     uint64_t m_value;
 
   public:
+    using ranged_value_type = RangedValueEUI64;
+    using ranged_value_type_eui64 = RangedValueEUI64;
+
     RangedValueEUI64( uint64_t v = 0 ) : m_value( v ) {}
     virtual ~RangedValueEUI64() {}
 
@@ -1852,7 +1861,7 @@ class RangedValueEUI64 : public RangedValueBase
 
     double getEncodedValueDouble() const override { throw std::runtime_error( "invalid type for EUI64" ); }
 
-    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) { setUnencodedValueString( storage->get() ); }
+    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) override { setUnencodedValueString( storage->get() ); }
 
     bool setFromEncodedValueInt8( int8_t v ) override { throw std::runtime_error( "invalid type for EUI64" ); }
 
@@ -1983,11 +1992,17 @@ class RangedValueBool : public RangedValueBase
     bool m_value;
 
   public:
+    using ranged_value_type = RangedValueBool;
+    using ranged_value_type_bool = RangedValueBool;
+
     RangedValueBool( bool v = DefaultValue ) : m_value( v ) {}
     virtual ~RangedValueBool() {}
 
     bool isReadOnly() const override { return ReadOnly; }
 
+    operator bool() const { return m_value; }
+
+    bool getValue() const { return m_value; }
     ///
     /// \brief getUnitsCode
     ///
@@ -2210,7 +2225,7 @@ class RangedValueBool : public RangedValueBase
 
     double getEncodedValueDouble() const override { return m_value == true ? 255.0 : 0; }
 
-    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) { setUnencodedValueString( storage->get() ); }
+    void setFromEncodedValueAvdeccString( const AvdeccString *storage ) override { setUnencodedValueString( storage->get() ); }
 
     bool setFromEncodedValueInt8( int8_t v ) override { return setValue( v == 0 ? false : true ); }
 
@@ -2326,11 +2341,14 @@ class RangedValueBool : public RangedValueBase
     void getUnencodedValue( uint64_t *v ) const { *v = getUnencodedValueUInt64(); }
 };
 
-template <UnitsCode UnitsValue, int MultiplierPowerValue, typename EncodedT, typename ValueT, bool ReadOnly>
-class RangedValueWithDynamicRanges : public RangedValueBase
+template <UnitsCode UnitsValue, int MultiplierPowerValue, typename EncodedT, bool ReadOnly>
+class RangedValueWithDynamicRangesFloat : public RangedValueBase
 {
   public:
-    typedef ValueT value_type;
+    using ranged_value_type = RangedValueWithDynamicRangesFloat;
+    using ranged_value_type_float = RangedValueWithDynamicRangesFloat;
+
+    typedef float value_type;
     typedef EncodedT encoded_type;
 
     EncodedT min_value = 0;
@@ -2354,7 +2372,7 @@ class RangedValueWithDynamicRanges : public RangedValueBase
     ///
     /// Initialize to the default value
     ///
-    RangedValueWithDynamicRanges() { setDefault(); }
+    RangedValueWithDynamicRangesFloat() { setDefault(); }
 
     ///
     /// \brief Value implicit Constructor
@@ -2364,7 +2382,7 @@ class RangedValueWithDynamicRanges : public RangedValueBase
     ///
     /// \param v value
     ///
-    RangedValueWithDynamicRanges( value_type v ) { setValue( v ); }
+    RangedValueWithDynamicRangesFloat( value_type v ) { setValue( v ); }
 
     ///
     /// \brief Value
@@ -2373,7 +2391,7 @@ class RangedValueWithDynamicRanges : public RangedValueBase
     ///
     /// \param v Source Value object
     ///
-    RangedValueWithDynamicRanges( RangedValueWithDynamicRanges const &v )
+    RangedValueWithDynamicRangesFloat( RangedValueWithDynamicRangesFloat const &v )
         : min_value( v.min_value )
         , max_value( v.max_value )
         , step_value( v.step_value )
@@ -2390,7 +2408,7 @@ class RangedValueWithDynamicRanges : public RangedValueBase
     /// \param v Source Value object
     /// \return  *this
     ///
-    RangedValueWithDynamicRanges &operator=( RangedValueWithDynamicRanges const &v )
+    RangedValueWithDynamicRangesFloat &operator=( RangedValueWithDynamicRangesFloat const &v )
     {
         min_value = v.min_value;
         max_value = v.max_value;
@@ -2489,9 +2507,9 @@ class RangedValueWithDynamicRanges : public RangedValueBase
         return r;
     }
 
-    EncodingType getStorageType() const override { return EncodingTypeFor<ValueT>::getEncodingType(); }
+    EncodingType getStorageType() const override { return EncodingTypeFor<value_type>::getEncodingType(); }
 
-    EncodingType getEncodingType() const override { return EncodingTypeFor<EncodedT>::getEncodingType(); }
+    EncodingType getEncodingType() const override { return EncodingTypeFor<value_type>::getEncodingType(); }
 
     bool setUnencodedValueString( string const &v, bool force ) override
     {

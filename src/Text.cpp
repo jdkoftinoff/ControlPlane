@@ -283,13 +283,13 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
 
     std::stringstream response;
     response << formstring( "?{'", escapeString( address.m_value ), "'" );
+    response << ": { ";
 
     if ( identity.m_section == ControlIdentity::SectionDescriptorLevel
          || identity.m_section == ControlIdentity::SectionWPosLevel )
     {
         DescriptorPtr d = m_schema.getTarget().getDescriptor( identity );
 
-        response << ": { ";
         response << "'control_type' : '0x" << std::hex << d->getAvdeccControlType() << std::dec << "', ";
         response << "'control_value_type' : '" << d->getAvdeccControlValueType() << "', ";
 
@@ -325,30 +325,25 @@ void TextProtocolSession::handleIndividualDescribe( Milliseconds current_time_in
         {
             response << "'false'";
         }
-        response << ", ";
-        response << "'items' : [ ";
-        for ( size_t item = 0; item < d->getNumValues(); ++item )
+        if ( d->getNumValues() > 0 )
         {
-            ControlValue const &v = d->getValue( item );
+            response << ", ";
+            response << "'item' : { ";
+            ControlValue const &v = d->getValue( identity.m_item );
 
             response << describeRangedValue( v.m_name, *v.m_ranged_value );
-
-            if ( item + 1 < d->getNumValues() )
-            {
-                response << "} , ";
-            }
+            response << "}";
         }
-        response << "]";
     }
     else if ( identity.m_section == ControlIdentity::SectionName )
     {
         const RangedValueBase *v = m_schema.getTarget().getRangedValueForControlIdentity( identity );
-        response << ":" << describeRangedValue( formstring( "name_", identity.m_item + 1 ), *v );
+        response << describeRangedValue( formstring( "name_", identity.m_item + 1 ), *v );
     }
     else
     {
         const RangedValueBase *v = m_schema.getTarget().getRangedValueForControlIdentity( identity );
-        response << ":" << describeRangedValue( formstring( "item_", identity.m_h_pos + 1, "_", identity.m_w_pos + 1 ), *v );
+        response << describeRangedValue( formstring( "item_", identity.m_h_pos + 1, "_", identity.m_w_pos + 1 ), *v );
     }
     response << "}}";
     m_io.sendLine( response.str() );
@@ -383,28 +378,25 @@ string TextProtocolSession::describeRangedValue( const std::string &name, const 
     string response;
     if ( v.getStorageType() == EncodingType::ENCODING_STRING64 || v.getStorageType() == EncodingType::ENCODING_STRING406 )
     {
-        response = formstring( "[ { 'value' : '", escapeString( v.getUnencodedValueString( false ) ), "'", "} ]" );
+        response = formstring( "'value' : '", escapeString( v.getUnencodedValueString( false ) ), "'" );
     }
     else
     {
-        response = formstring(
-            "{"
-            " 'name' : '",
-            escapeString( name ),
-            "', 'value' : '",
-            escapeString( v.getUnencodedValueString( false ) ),
-            "', 'minimum' : '",
-            escapeString( v.getUnencodedMinimumString( false ) ),
-            "', 'maximum' : '",
-            escapeString( v.getUnencodedMaximumString( false ) ),
-            "', 'default' : '",
-            escapeString( v.getUnencodedDefaultString( false ) ),
-            "', 'step' : '",
-            escapeString( v.getUnencodedStepString( false ) ),
-            "', 'units' : '",
-            escapeString( v.getUnitsSuffix() ),
-            "'",
-            "}" );
+        response = formstring( " 'name' : '",
+                               escapeString( name ),
+                               "', 'value' : '",
+                               escapeString( v.getUnencodedValueString( false ) ),
+                               "', 'minimum' : '",
+                               escapeString( v.getUnencodedMinimumString( false ) ),
+                               "', 'maximum' : '",
+                               escapeString( v.getUnencodedMaximumString( false ) ),
+                               "', 'default' : '",
+                               escapeString( v.getUnencodedDefaultString( false ) ),
+                               "', 'step' : '",
+                               escapeString( v.getUnencodedStepString( false ) ),
+                               "', 'units' : '",
+                               escapeString( v.getUnitsSuffix() ),
+                               "'" );
     }
     return response;
 }

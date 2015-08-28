@@ -18,28 +18,6 @@ void DescriptorBase::collectOwnedDescriptors( DescriptorCounts &counts, ControlC
             i->collectOwnedDescriptors( counts, top );
         }
     }
-
-#if 0
-    SchemaAddress parent_address = address;
-
-    SchemaAddressElement type_elem = avdeccDescriptorTypeName[ getAvdeccDescriptorType() ];
-    parent_address.push_back( type_elem );
-    ControlContainerPtr descriptor_type_item = top->addItem( type_elem );
-    SchemaAddressElement item_elem = Util::formstring( getAvdeccDescriptorIndex() );
-    descriptor_type_item->addItem( item_elem,shared_from_this(),getControlIdentity());
-    parent_address.push_back( item_elem );
-    ControlContainerPtr descriptor_item_item = top->addItem( item_elem );
-
-    for ( auto &v : m_child_descriptor_map )
-    {
-        for ( auto &i : v.second )
-        {
-            i->collectOwnedDescriptors( counts, descriptor_item_item, parent_address );
-        }
-    }
-    parent_address.pop_back();
-    parent_address.pop_back();
-#endif
 }
 
 void DescriptorBase::addChildDescriptor( std::shared_ptr<DescriptorBase> d )
