@@ -178,7 +178,7 @@ void TextProtocolSession::handleSubscribe( Milliseconds current_time_in_millisec
 
     TextAddress subscription_address;
     Milliseconds min_update_period{30};
-    Milliseconds max_update_period{10000};
+    Milliseconds max_update_period{0};
 
     if ( params.size() > 0 )
     {
@@ -193,7 +193,7 @@ void TextProtocolSession::handleSubscribe( Milliseconds current_time_in_millisec
     if ( params.size() > 2 )
     {
         int64_t v;
-        lexical_cast( v, params[1] );
+        lexical_cast( v, params[2] );
         max_update_period = Milliseconds( v );
     }
 
@@ -370,7 +370,6 @@ void TextProtocolSession::handleIndividualSubscribe( Milliseconds current_time_i
 void TextProtocolSession::handleIndividualUnsubscribe( Milliseconds current_time_in_milliseconds, const TextAddress &address )
 {
     m_notifier.getNotifier()->removeAddressSubscription( address );
-    m_io.sendLine( formstring( "-", address ) );
 }
 
 string TextProtocolSession::describeRangedValue( const std::string &name, const RangedValueBase &v )

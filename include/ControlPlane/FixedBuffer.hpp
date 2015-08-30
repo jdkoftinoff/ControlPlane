@@ -303,7 +303,7 @@ class FixedBuffer
     /// \param pos Position within buffer
     /// \return Eui64 value
     ///
-    Eui64 getEUI64( uint16_t pos ) { return Eui64( m_buf + pos ); }
+    Eui64 getEUI64( uint16_t pos ) const { return Eui64( m_buf + pos ); }
 
     ///
     /// \brief getBuf Get the raw pointer to the buffer

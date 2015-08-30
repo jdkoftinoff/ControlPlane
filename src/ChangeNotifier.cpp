@@ -84,8 +84,9 @@ void ChangeNotifier::tick( Milliseconds current_timestamp_in_milliseconds )
                 if ( state.m_last_change_time_in_milliseconds > state.m_last_change_acknowledged_time_in_milliseconds )
                 {
                     // Yes, was it changed at least state.m_max_update_period_in_milliseconds ago?
-                    if ( ( current_timestamp_in_milliseconds - state.m_max_update_period_in_milliseconds )
-                         >= state.m_last_change_acknowledged_time_in_milliseconds )
+                    if ( ( state.m_max_update_period_in_milliseconds != Milliseconds( 0 ) )
+                         && ( ( current_timestamp_in_milliseconds - state.m_max_update_period_in_milliseconds )
+                              >= state.m_last_change_acknowledged_time_in_milliseconds ) )
                     {
                         // yes, do the notify
                         notify = true;
