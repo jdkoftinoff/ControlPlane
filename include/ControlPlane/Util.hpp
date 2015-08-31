@@ -79,5 +79,39 @@ inline Milliseconds getCurrentTimeInMilliseconds()
     Milliseconds current_time_in_milliseconds = std::chrono::duration_cast<Milliseconds>( duration );
     return current_time_in_milliseconds;
 }
+
+inline void copySockaddr( sockaddr_storage *result, sockaddr const *input )
+{
+    memset( result, 0, sizeof( sockaddr_storage ) );
+    if ( input->sa_family == AF_INET )
+    {
+        memcpy( result, input, sizeof( sockaddr_in ) );
+    }
+    else if ( input->sa_family == AF_INET6 )
+    {
+        memcpy( result, input, sizeof( sockaddr_in6 ) );
+    }
+}
+
+struct Less_sockaddr_storage
+{
+    bool operator()( const sockaddr_storage &lhs, const sockaddr_storage &rhs ) const
+    {
+        return memcmp( &lhs, &rhs, sizeof( lhs ) ) < 0;
+    }
+};
+
+struct Less_sockaddr_in
+{
+    bool operator()( const sockaddr_in &lhs, const sockaddr_in &rhs ) const { return memcmp( &lhs, &rhs, sizeof( lhs ) ) < 0; }
+};
+
+struct Less_sockaddr_in6
+{
+    bool operator()( const sockaddr_in6 &lhs, const sockaddr_in6 &rhs ) const
+    {
+        return memcmp( &lhs, &rhs, sizeof( lhs ) ) < 0;
+    }
+};
 }
 }

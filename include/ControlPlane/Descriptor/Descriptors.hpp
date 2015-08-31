@@ -2,7 +2,7 @@
 
 #include "../World.hpp"
 #include "../Values.hpp"
-#include "../AvdeccSchema.hpp"
+#include "../Avdecc.hpp"
 
 #include "Descriptor.hpp"
 #include "DescriptorCounts.hpp"

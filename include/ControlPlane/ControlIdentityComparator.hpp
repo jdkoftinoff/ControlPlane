@@ -1,7 +1,7 @@
 #pragma once
 
 #include "World.hpp"
-#include "AvdeccSchema.hpp"
+#include "Avdecc.hpp"
 #include "ControlIdentity.hpp"
 
 namespace ControlPlane

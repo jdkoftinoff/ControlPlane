@@ -3,9 +3,12 @@
 #include "ControlPlane/World.hpp"
 #include "ControlPlane/Util.hpp"
 
+#include "ControlPlane/Avdecc.hpp"
+#include "ControlPlane/AvdeccDirector.hpp"
 #include "ControlPlane/AvdeccControl.hpp"
 #include "ControlPlane/AvdeccControlReceiver.hpp"
 #include "ControlPlane/AvdeccControlSender.hpp"
+#include "ControlPlane/AvdeccDirector.hpp"
 #include "ControlPlane/AvdeccEncoding.hpp"
 #include "ControlPlane/AvdeccSchema.hpp"
 #include "ControlPlane/AvdeccString.hpp"

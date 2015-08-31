@@ -35,6 +35,13 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
+
+#ifndef _WIN32
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
 #endif

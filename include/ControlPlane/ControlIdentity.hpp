@@ -2,6 +2,7 @@
 
 #include "World.hpp"
 #include "ControlValue.hpp"
+#include "Avdecc.hpp"
 
 namespace ControlPlane
 {

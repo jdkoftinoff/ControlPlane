@@ -9,6 +9,6 @@ namespace Descriptor
 
 Matrix::~Matrix() {}
 
-void Matrix::storeToPDU( FixedBuffer &pdu ) const { /* TODO */ }
+void Matrix::storeToPDU( FixedBuffer &pdu ) const { /* TODO */}
 }
 }
