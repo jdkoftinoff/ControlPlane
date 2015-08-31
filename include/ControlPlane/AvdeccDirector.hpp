@@ -28,7 +28,7 @@ inline sockaddr_in ACMPMulticast<sockaddr_in>::getDestination()
     sockaddr_in r;
 
     r.sin_family = AF_INET;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin_len = sizeof( sockaddr_in );
 #endif
     r.sin_port = htons( 17221 );
@@ -42,7 +42,7 @@ inline sockaddr_in6 ACMPMulticast<sockaddr_in6>::getDestination()
     sockaddr_in6 r;
 
     r.sin6_family = AF_INET6;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin6_len = sizeof( sockaddr_in6 );
 #endif
     r.sin6_port = htons( 17221 );
@@ -73,7 +73,7 @@ inline sockaddr_in AECPMulticast<sockaddr_in>::getDestination()
     sockaddr_in r;
 
     r.sin_family = AF_INET;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin_len = sizeof( sockaddr_in );
 #endif
     r.sin_port = htons( 17221 );
@@ -87,7 +87,7 @@ inline sockaddr_in6 AECPMulticast<sockaddr_in6>::getDestination()
     sockaddr_in6 r;
 
     r.sin6_family = AF_INET6;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin6_len = sizeof( sockaddr_in6 );
 #endif
     r.sin6_port = htons( 17221 );
@@ -115,7 +115,7 @@ inline sockaddr_in MAAPMulticast<sockaddr_in>::getDestination()
     sockaddr_in r;
 
     r.sin_family = AF_INET;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin_len = sizeof( sockaddr_in );
 #endif
     r.sin_port = htons( 17221 );
@@ -129,7 +129,7 @@ inline sockaddr_in6 MAAPMulticast<sockaddr_in6>::getDestination()
     sockaddr_in6 r;
 
     r.sin6_family = AF_INET6;
-#if defined( __APPLE__ )
+#if defined(__APPLE__)
     r.sin6_len = sizeof( sockaddr_in6 );
 #endif
     r.sin6_port = htons( 17221 );
