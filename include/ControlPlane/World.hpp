@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
+#include <queue>
 
 #ifndef _WIN32
 #include <sys/socket.h>

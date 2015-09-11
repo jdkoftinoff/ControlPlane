@@ -3,4 +3,6 @@
 
 namespace ControlPlane
 {
+
+const char *avdeccschema_file = __FILE__;
 }
