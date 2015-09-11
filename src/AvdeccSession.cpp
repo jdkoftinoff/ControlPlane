@@ -687,17 +687,98 @@ void AvdeccSession::receivedAemResponse( const FixedBuffer &pdu )
 
 void AvdeccSession::receivedAACommand( const FixedBuffer &request )
 {
-    sendReply( request, AVDECC_AECP_STATUS_NOT_IMPLEMENTED );
+    FixedBufferWithSize<1500> pdu;
+    pdu.putBuf( request );
+
+    uint16_t sequence_id = pdu.getDoublet( AVDECC_AECPDU_AA_OFFSET_SEQUENCE_ID );
+
+    if ( m_received_aa_command_sequence_ids.find( sequence_id ) == m_received_aa_command_sequence_ids.end() )
+    {
+        uint16_t tlv_count = pdu.getDoublet( AVDECC_AECPDU_AA_OFFSET_TLV_COUNT );
+
+        // go through the TLV's and dispatch the read/writes and respond
+        uint8_t *p = pdu.getBuf() + AVDECC_AECPDU_AA_LEN;
+        uint8_t aa_status = AVDECC_AECPDU_AA_STATUS_NOT_IMPLEMENTED;
+
+        for ( uint16_t i = 0; i < tlv_count; ++i )
+        {
+            // See 9.2.1.3.3
+            uint8_t tlv_mode = ( p[AVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] >> 4 ) & 0xf;
+
+            uint16_t tlv_length = ( ( ( uint16_t )( p[AVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH] & 0xf ) ) << 4 )
+                                  + p[AVDECC_AECPDU_AA_TLV_OFFSET_MODE_LENGTH + 1];
+
+            uint64_t tlv_address = ( (uint64_t)p[0] << ( 7 * 8 ) ) + ( (uint64_t)p[0] << ( 6 * 8 ) )
+                                   + ( (uint64_t)p[0] << ( 5 * 8 ) ) + ( (uint64_t)p[0] << ( 4 * 8 ) )
+                                   + ( (uint64_t)p[0] << ( 3 * 8 ) ) + ( (uint64_t)p[0] << ( 2 * 8 ) )
+                                   + ( (uint64_t)p[0] << ( 1 * 8 ) ) + ( (uint64_t)p[0] << ( 0 * 8 ) );
+
+            switch ( tlv_mode )
+            {
+            case AVDECC_AECPDU_AA_MODE_READ:
+            {
+                FixedBuffer data( p + AVDECC_AECPDU_AA_TLV_LEN, tlv_length );
+                data.setLength( tlv_length );
+                aa_status = receivedAARead( pdu, tlv_address, data );
+                break;
+            }
+            case AVDECC_AECPDU_AA_MODE_WRITE:
+            {
+                FixedBuffer data( p + AVDECC_AECPDU_AA_TLV_LEN, tlv_length );
+                data.setLength( tlv_length );
+                aa_status = receivedAAWrite( pdu, tlv_address, data );
+                break;
+            }
+            case AVDECC_AECPDU_AA_MODE_EXECUTE:
+            {
+                aa_status = receivedAAExecute( pdu, tlv_address );
+                break;
+            }
+            }
+
+            p = p + AVDECC_AECPDU_AA_TLV_LEN + tlv_length;
+            if ( aa_status != AVDECC_AECPDU_AA_STATUS_SUCCESS )
+            {
+                break;
+            }
+        }
+        // Send the response to either just the requesting controller or it and all
+        // registered controllers
+        pdu.setOctet( ( pdu.getOctet( 2 ) & 0x7 ) + ( aa_status << 3 ), 2 );
+
+        sendReply( pdu, aa_status );
+
+        // clear out any old sequence_ids from the history
+        for ( auto i = m_received_aa_command_sequence_ids.begin(); i != m_received_aa_command_sequence_ids.end(); )
+        {
+            uint16_t diff = sequence_id - *i;
+
+            if ( diff > 512 )
+            {
+                m_received_aa_command_sequence_ids.erase( i++ );
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
 }
 
-void AvdeccSession::receivedAAResponse( const FixedBuffer &request )
+void AvdeccSession::receivedAAResponse( const FixedBuffer &request ) {}
+
+uint8_t AvdeccSession::receivedAAWrite( const FixedBuffer &request, uint64_t address, const FixedBuffer &data )
 {
-    sendReply( request, AVDECC_AECP_STATUS_NOT_IMPLEMENTED );
+    return AVDECC_AECPDU_AA_STATUS_NOT_IMPLEMENTED;
 }
 
-void AvdeccSession::receivedAAWrite( const FixedBuffer &request, uint64_t address, const FixedBuffer &data ) {}
+uint8_t AvdeccSession::receivedAARead( const FixedBuffer &request, uint64_t address, FixedBuffer &data )
+{
+    return AVDECC_AECPDU_AA_STATUS_NOT_IMPLEMENTED;
+}
 
-void AvdeccSession::receivedAARead( const FixedBuffer &request, uint64_t address, FixedBuffer &data ) {}
-
-void AvdeccSession::receivedAAExecute( const FixedBuffer &request, uint64_t address ) {}
+uint8_t AvdeccSession::receivedAAExecute( const FixedBuffer &request, uint64_t address )
+{
+    return AVDECC_AECPDU_AA_STATUS_NOT_IMPLEMENTED;
+}
 }

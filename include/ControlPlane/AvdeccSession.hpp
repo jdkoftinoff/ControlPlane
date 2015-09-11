@@ -19,6 +19,7 @@ struct AvdeccSession
     Milliseconds m_last_tick_time_in_milliseconds;
     std::set<uint16_t> m_received_aem_command_sequence_ids;
     std::set<uint16_t> m_received_aem_response_sequence_ids;
+    std::set<uint16_t> m_received_aa_command_sequence_ids;
 
   public:
     AvdeccSession( SchemaAvdeccAdaptor &schema,
@@ -46,11 +47,11 @@ struct AvdeccSession
 
     virtual void receivedAAResponse( FixedBuffer const &request );
 
-    virtual void receivedAAWrite( FixedBuffer const &request, uint64_t address, FixedBuffer const &data );
+    virtual uint8_t receivedAAWrite( FixedBuffer const &request, uint64_t address, FixedBuffer const &data );
 
-    virtual void receivedAARead( FixedBuffer const &request, uint64_t address, FixedBuffer &data );
+    virtual uint8_t receivedAARead( FixedBuffer const &request, uint64_t address, FixedBuffer &data );
 
-    virtual void receivedAAExecute( FixedBuffer const &request, uint64_t address );
+    virtual uint8_t receivedAAExecute( FixedBuffer const &request, uint64_t address );
 
     virtual void acquireEntity( FixedBuffer const &request ) { sendReply( request, AVDECC_AECP_STATUS_NOT_IMPLEMENTED ); }
 
